@@ -1,0 +1,21 @@
+skill_name: demo_skill
+skill_type: qa
+base_url: mock://demo-skill/query
+auth_type: none
+init_required: true
+required_params:
+  - user_id
+  - workspace_id
+setup_steps:
+  - create_session
+  - bind_kb
+execute_mode: chat
+assert_type: keyword+regex+semantic_similarity
+score_threshold: 0.75
+enabled: true
+default_headers:
+  X-Demo: ai-auto-test
+mock_answers:
+  "怎么查看日报？": "可以在报表中心查看日报，并按日期筛选团队日报。"
+  "如何绑定知识库？": "进入知识库设置，选择目标知识库后点击绑定。"
+

@@ -1,0 +1,42 @@
+[
+  {
+    "case_id": "DEMO_SMOKE_001",
+    "skill_name": "demo_skill",
+    "module": "skill",
+    "scenario": "日报查询",
+    "input_params": {
+      "user_id": "u001",
+      "workspace_id": "w001",
+      "knowledge_base_id": "kb_demo"
+    },
+    "question": "怎么查看日报？",
+    "expected_answer": "在报表中心查看日报。",
+    "keywords": ["报表中心", "日报"],
+    "regex_patterns": ["报表中心.*日报|日报.*报表中心"],
+    "forbidden_words": ["无法查看"],
+    "assert_type": "keyword+regex+semantic_similarity",
+    "score_threshold": 0.75,
+    "enabled": true,
+    "priority": "P0"
+  },
+  {
+    "case_id": "DEMO_REG_001",
+    "skill_name": "demo_skill",
+    "module": "skill",
+    "scenario": "知识库绑定",
+    "input_params": {
+      "user_id": "u001",
+      "workspace_id": "w001",
+      "knowledge_base_id": "kb_demo"
+    },
+    "question": "如何绑定知识库？",
+    "expected_answer": "在知识库设置中选择目标知识库并绑定。",
+    "keywords": ["知识库", "绑定"],
+    "forbidden_words": [],
+    "assert_type": "keyword+semantic_similarity",
+    "score_threshold": 0.6,
+    "enabled": true,
+    "priority": "P1"
+  }
+]
+

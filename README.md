@@ -1064,3 +1064,78 @@ expected_tool: report_service
 
 如果你认可这个方向，下一步就可以直接开始进入"搭框架"阶段，我可以继续帮你把这份方案落成一个可运行的 Python 项目骨架。
 # ai_auto_test
+
+## 19. 当前项目已落地的 MVP 框架
+
+当前项目已经按“通用 Skill 生命周期”搭建了首版可运行骨架，默认链路为：
+
+```text
+读取 case -> 读取 Skill 配置 -> 校验前置参数 -> setup 初始化 -> 执行 Skill -> 统一评估 -> pytest / Allure 报告
+```
+
+### 19.1 已落地目录
+
+```text
+config/
+├── settings.py
+└── skills/
+    └── demo_skill.yaml
+core/
+├── client.py
+├── evaluator.py
+├── loader.py
+├── models.py
+├── setup_manager.py
+└── skill_manager.py
+evaluators/
+├── exact_match.py
+├── keyword_match.py
+├── regex_match.py
+├── semantic_similarity.py
+├── llm_judge.py
+├── retrieval_check.py
+└── tool_call_check.py
+data/
+└── skill_cases.json
+testcases/
+├── test_skill_smoke.py
+├── test_skill_regression.py
+└── test_skill_routing.py
+```
+
+### 19.2 本地运行
+
+安装依赖：
+
+```bash
+venv/bin/python -m pip install -r requirements.txt
+```
+
+运行全部测试：
+
+```bash
+venv/bin/python -m pytest
+```
+
+只运行冒烟：
+
+```bash
+venv/bin/python -m pytest -m smoke
+```
+
+生成 Allure 结果：
+
+```bash
+venv/bin/python run.py --allure
+```
+
+### 19.3 新 Skill 接入方式
+
+新增一个 Skill 时，优先只改两类文件：
+
+1. 在 `config/skills/` 下新增一份 Skill 配置，例如 `report_query.yaml`
+2. 在 `data/skill_cases.json` 中增加该 Skill 的测试 case
+
+如果新 Skill 有特殊初始化动作，再扩展 `core/setup_manager.py`。
+
+如果新 Skill 需要新的判断方式，再扩展 `evaluators/`，并在 `core/evaluator.py` 中注册策略。
