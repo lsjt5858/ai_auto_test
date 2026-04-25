@@ -1,0 +1,12 @@
+skill_name: byted-bytehouse-ai-query
+skill_type: database_qa
+base_url: sample://arkclaw-response
+auth_type: none
+init_required: false
+required_params: []
+setup_steps: []
+execute_mode: sample
+assert_type: rubric
+score_threshold: 0.8
+enabled: true
+

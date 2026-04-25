@@ -4,7 +4,7 @@ import time
 from typing import Any
 from uuid import uuid4
 
-import httpx
+import requests
 from tenacity import retry, stop_after_attempt, wait_fixed
 
 from config.settings import settings
@@ -17,7 +17,9 @@ class SkillClient:
 
     def execute(self, skill: SkillConfig, case: TestCase, context: dict[str, Any]) -> SkillResponse:
         started = time.perf_counter()
-        if skill.base_url.startswith("mock://"):
+        if skill.base_url.startswith("sample://"):
+            response = self._execute_sample(case, context)
+        elif skill.base_url.startswith("mock://"):
             response = self._execute_mock(skill, case, context)
         else:
             response = self._execute_http(skill, case, context)
@@ -43,6 +45,20 @@ class SkillClient:
             raw={"context": context, "skill": skill.skill_name, "question": case.question},
         )
 
+    def _execute_sample(self, case: TestCase, context: dict[str, Any]) -> SkillResponse:
+        answer = str(
+            case.raw.get("actual_response")
+            or case.raw.get("真实返回举例（ArkClaw）")
+            or case.raw.get("真实返回")
+            or ""
+        )
+        return SkillResponse(
+            success=bool(answer),
+            answer=answer,
+            request_id=uuid4().hex,
+            raw={"context": context, "question": case.question, "source": "sample_response"},
+        )
+
     @retry(stop=stop_after_attempt(2), wait=wait_fixed(1))
     def _execute_http(self, skill: SkillConfig, case: TestCase, context: dict[str, Any]) -> SkillResponse:
         headers = dict(skill.default_headers)
@@ -54,10 +70,9 @@ class SkillClient:
             "question": case.question,
             "params": context,
         }
-        with httpx.Client(timeout=self.timeout_seconds) as client:
-            resp = client.post(skill.base_url, json=payload, headers=headers)
-            resp.raise_for_status()
-            data = resp.json()
+        resp = requests.post(skill.base_url, json=payload, headers=headers, timeout=self.timeout_seconds)
+        resp.raise_for_status()
+        data = resp.json()
 
         return SkillResponse(
             success=bool(data.get("success", True)),
@@ -68,4 +83,3 @@ class SkillClient:
             retrievals=list(data.get("retrievals", [])),
             tool_calls=list(data.get("tool_calls", [])),
         )
-

@@ -28,9 +28,9 @@ class Settings:
     env: str = os.getenv("AI_TEST_ENV", "local")
     timeout_seconds: float = float(os.getenv("AI_TEST_TIMEOUT_SECONDS", "30"))
     default_score_threshold: float = float(os.getenv("AI_TEST_DEFAULT_SCORE_THRESHOLD", "0.8"))
+    case_file: str = os.getenv("AI_TEST_CASE_FILE", "")
     api_token: str = os.getenv("AI_TEST_API_TOKEN", "")
     judge_api_key: str = os.getenv("AI_TEST_JUDGE_API_KEY", "")
 
 
 settings = Settings()
-

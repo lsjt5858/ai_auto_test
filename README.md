@@ -1073,6 +1073,8 @@ expected_tool: report_service
 读取 case -> 读取 Skill 配置 -> 校验前置参数 -> setup 初始化 -> 执行 Skill -> 统一评估 -> pytest / Allure 报告
 ```
 
+接口调用层当前使用 `requests`，不再使用 `httpx`。如果某个 Skill 还没有真实 HTTP 入口，可以先把 `base_url` 配成 `sample://...`，框架会读取评测集中的“真实返回举例”做离线评估。
+
 ### 19.1 已落地目录
 
 ```text
@@ -1122,6 +1124,20 @@ venv/bin/python -m pytest
 ```bash
 venv/bin/python -m pytest -m smoke
 ```
+
+使用外部 CSV 评测集：
+
+```bash
+AI_TEST_CASE_FILE="临时添加的文件，仅供参考/核心能力测试评测集 - 评测集.csv" venv/bin/python -m pytest -m smoke
+```
+
+这类 CSV 支持以下中文字段自动映射：
+
+- `skill` -> `skill_name`
+- `input` -> `question`
+- `预期的返回（部分关键信息）` -> `expected_answer`
+- `真实返回举例（ArkClaw）` -> `actual_response`
+- `rule` -> `rule`
 
 生成 Allure 结果：
 
