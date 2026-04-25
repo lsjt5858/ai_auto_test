@@ -25,3 +25,7 @@ env/
 
 
 临时添加的文件，仅供参考/
+
+# Test reports
+reports/allure-results/
+reports/allure-report/

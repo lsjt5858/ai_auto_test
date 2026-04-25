@@ -1145,6 +1145,20 @@ AI_TEST_CASE_FILE="临时添加的文件，仅供参考/核心能力测试评测
 venv/bin/python run.py --allure
 ```
 
+打开 Allure 报告（需要先安装 Allure CLI）：
+
+```bash
+brew install allure
+allure serve reports/allure-results
+```
+
+或生成静态报告目录：
+
+```bash
+allure generate reports/allure-results -o reports/allure-report --clean
+allure open reports/allure-report
+```
+
 ### 19.3 新 Skill 接入方式
 
 新增一个 Skill 时，优先只改两类文件：
