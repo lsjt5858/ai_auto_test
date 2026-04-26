@@ -1,0 +1,12 @@
+case_id,skill,input,预期的返回（部分关键信息）,真实返回举例（ArkClaw）,rule
+DATA_ASSET_001,byted-bytehouse-data-asset-analyzer,分析 default 数据库并生成数据资产目录,"输出 schema、catalog、lineage 三类结果文件","分析完成。输出文件已保存到 output 目录：schema_default_20260425_120000.json、catalog_default_20260425_120000.json、lineage_default_20260425_120000.json。数据资产目录包含 total_tables、total_columns、engines 和 tables。","- 必须包含 schema 文件
+- 必须包含 catalog 文件
+- 必须包含 lineage 文件
+- 不应该出现连接失败、权限不足、MCP 初始化失败"
+DATA_ASSET_002,byted-bytehouse-data-asset-analyzer,获取数据库完整 schema,"返回 database、tables、columns、create_table_query 等字段","Schema 生成成功。database=default，tables 中包含表名、engine、columns、create_table_query。每个 column 包含 name、type、comment。","- 必须说明获取了数据库 schema
+- 如果输出字段结构，必须包含 tables 和 columns
+- 不应该出现空表列表或解析失败"
+DATA_ASSET_003,byted-bytehouse-data-asset-analyzer,生成表血缘分析,"返回 table_relationships 和 column_similarities","血缘分析生成成功。lineage 中包含 table_relationships 和 column_similarities；识别 Distributed 表和 Local 表之间的关系。","- 必须包含 table_relationships
+- 必须包含 column_similarities
+- 如果有 Distributed 和 Local 表，应该说明二者关系"
+

@@ -1,0 +1,11 @@
+case_id,skill,input,expected_answer,keywords,forbidden_words,assert_type,score_threshold
+ONLINE_001,byted-bytehouse-ai-query-online,SELECT 1,1,1,Error,keyword,1.0
+ONLINE_002,byted-bytehouse-ai-query-online,SHOW DATABASES,system,system,Error,keyword,1.0
+ONLINE_003,byted-bytehouse-ai-query-online,DROP DATABASE IF EXISTS ai_auto_test_tmp,,,Error,rubric,1.0
+ONLINE_004,byted-bytehouse-ai-query-online,CREATE DATABASE IF NOT EXISTS ai_auto_test_tmp,,,Error,rubric,1.0
+ONLINE_005,byted-bytehouse-ai-query-online,"CREATE TABLE IF NOT EXISTS ai_auto_test_tmp.users (id UInt64, name String, age UInt8) ENGINE = CnchMergeTree ORDER BY id",,,"Error",rubric,1.0
+ONLINE_006,byted-bytehouse-ai-query-online,"INSERT INTO ai_auto_test_tmp.users VALUES (1, 'alice', 18), (2, 'bob', 20), (3, 'carol', 22)",script completed successfully,script completed successfully,Error,keyword,1.0
+ONLINE_007,byted-bytehouse-ai-query-online,SELECT sleep(2),0,0,Error,keyword,1.0
+ONLINE_008,byted-bytehouse-ai-query-online,SELECT count() FROM ai_auto_test_tmp.users,3,3,Error,keyword,1.0
+ONLINE_009,byted-bytehouse-ai-query-online,SELECT name FROM ai_auto_test_tmp.users WHERE id = 2,bob,bob,Error,keyword,1.0
+ONLINE_010,byted-bytehouse-ai-query-online,DROP DATABASE IF EXISTS ai_auto_test_tmp,,,Error,rubric,1.0

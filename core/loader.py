@@ -13,21 +13,31 @@ from core.models import TestCase
 
 
 def load_cases(path: str | Path | None = None) -> list[TestCase]:
-    selected_path = path or settings.case_file or ROOT_DIR / "data" / "skill_cases.json"
+    selected_path = path or settings.case_file or settings.case_dir or ROOT_DIR / "data" / "skill_cases.json"
     case_path = Path(selected_path)
     if not case_path.is_absolute():
         case_path = ROOT_DIR / case_path
 
+    if case_path.is_dir():
+        cases: list[TestCase] = []
+        for child in sorted(case_path.iterdir()):
+            if child.suffix.lower() in {".csv", ".json"}:
+                cases.extend(load_cases(child))
+        return cases
+
+    records = _load_records(case_path)
+    return [_to_case(record) for record in records if _is_valid_record(record) and _as_bool(record.get("enabled", True))]
+
+
+def _load_records(case_path: Path) -> list[dict[str, Any]]:
     suffix = case_path.suffix.lower()
     if suffix == ".json":
-        records = json.loads(case_path.read_text(encoding="utf-8"))
-    elif suffix == ".csv":
+        data = json.loads(case_path.read_text(encoding="utf-8"))
+        return data if isinstance(data, list) else data.get("cases", [])
+    if suffix == ".csv":
         with case_path.open(newline="", encoding="utf-8-sig") as f:
-            records = list(csv.DictReader(f))
-    else:
-        raise ValueError(f"Unsupported case file type: {case_path}")
-
-    return [_to_case(record) for record in records if _is_valid_record(record) and _as_bool(record.get("enabled", True))]
+            return list(csv.DictReader(f))
+    raise ValueError(f"Unsupported case file type: {case_path}")
 
 
 def _to_case(record: dict[str, Any]) -> TestCase:

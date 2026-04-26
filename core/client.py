@@ -1,12 +1,17 @@
 from __future__ import annotations
 
+import os
+import subprocess
+import sys
 import time
+from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
 import requests
 from tenacity import retry, stop_after_attempt, wait_fixed
 
+from config.settings import ROOT_DIR
 from config.settings import settings
 from core.models import SkillConfig, SkillResponse, TestCase
 
@@ -17,7 +22,9 @@ class SkillClient:
 
     def execute(self, skill: SkillConfig, case: TestCase, context: dict[str, Any]) -> SkillResponse:
         started = time.perf_counter()
-        if skill.base_url.startswith("sample://"):
+        if skill.base_url.startswith("script://"):
+            response = self._execute_script(skill, case, context)
+        elif skill.base_url.startswith("sample://"):
             response = self._execute_sample(case, context)
         elif skill.base_url.startswith("mock://"):
             response = self._execute_mock(skill, case, context)
@@ -57,6 +64,48 @@ class SkillClient:
             answer=answer,
             request_id=uuid4().hex,
             raw={"context": context, "question": case.question, "source": "sample_response"},
+        )
+
+    def _execute_script(self, skill: SkillConfig, case: TestCase, context: dict[str, Any]) -> SkillResponse:
+        script_ref = skill.base_url.removeprefix("script://")
+        script_path = Path(script_ref)
+        if not script_path.is_absolute():
+            script_path = ROOT_DIR / script_path
+
+        format_values = dict(case.raw)
+        format_values.update(context)
+        format_values["question"] = case.question
+
+        command = list(skill.raw.get("command", [sys.executable, str(script_path)]))
+        command = [part.format(**format_values) for part in command]
+        if not skill.raw.get("command"):
+            command = [sys.executable, str(script_path)]
+        command.extend(str(arg).format(**format_values) for arg in skill.raw.get("script_args", []))
+
+        env = os.environ.copy()
+        env.update({key: str(value) for key, value in context.items() if value not in (None, "")})
+        completed = subprocess.run(
+            command,
+            cwd=str(script_path.parent),
+            capture_output=True,
+            text=True,
+            timeout=self.timeout_seconds,
+            env=env,
+        )
+        answer = completed.stdout.strip() or completed.stderr.strip()
+        if completed.returncode == 0 and not answer:
+            answer = "script completed successfully"
+        return SkillResponse(
+            success=completed.returncode == 0,
+            answer=answer,
+            status_code=completed.returncode,
+            request_id=uuid4().hex,
+            raw={
+                "command": command,
+                "stdout": completed.stdout,
+                "stderr": completed.stderr,
+                "returncode": completed.returncode,
+            },
         )
 
     @retry(stop=stop_after_attempt(2), wait=wait_fixed(1))

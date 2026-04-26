@@ -1,0 +1,23 @@
+{
+  "global": {
+    "env": "local"
+  },
+  "skills": {
+    "byted-bytehouse-ai-query": {
+      "BYTEHOUSE_HOST": "tenant-xxx.bytehouse.volces.com",
+      "BYTEHOUSE_PORT": "8123",
+      "BYTEHOUSE_USER": "bytehouse",
+      "BYTEHOUSE_PASSWORD": "replace-me",
+      "BYTEHOUSE_SECURE": "true",
+      "BYTEHOUSE_VERIFY": "true"
+    },
+    "byted-bytehouse-data-asset-analyzer": {
+      "BYTEHOUSE_HOST": "tenant-xxx.bytehouse.volces.com",
+      "BYTEHOUSE_PORT": "8123",
+      "BYTEHOUSE_USER": "bytehouse",
+      "BYTEHOUSE_PASSWORD": "replace-me",
+      "BYTEHOUSE_SECURE": "true",
+      "BYTEHOUSE_VERIFY": "true"
+    }
+  }
+}

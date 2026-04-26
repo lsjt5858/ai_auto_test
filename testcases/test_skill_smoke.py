@@ -7,10 +7,11 @@ from testcases.conftest import attach_json
 
 
 @pytest.mark.smoke
-def test_skill_smoke(case, skill_manager, setup_manager, skill_client, evaluator) -> None:
+def test_skill_smoke(case, skill_manager, setup_manager, skill_client, evaluator, runtime_params) -> None:
     skill = skill_manager.get(case.skill_name)
-    skill_manager.validate_required_params(skill, case.input_params)
-    context = setup_manager.run(skill, case.input_params)
+    merged_params = runtime_params.merge(case.skill_name, case.input_params)
+    skill_manager.validate_required_params(skill, merged_params)
+    context = setup_manager.run(skill, merged_params)
 
     response = skill_client.execute(skill, case, context)
     result = evaluator.evaluate(skill, case, response)
@@ -23,4 +24,3 @@ def test_skill_smoke(case, skill_manager, setup_manager, skill_client, evaluator
     assert response.success
     assert response.answer
     assert_evaluation_passed(result)
-

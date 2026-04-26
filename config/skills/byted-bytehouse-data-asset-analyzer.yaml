@@ -1,0 +1,12 @@
+skill_name: byted-bytehouse-data-asset-analyzer
+skill_type: data_asset_analyzer
+base_url: sample://data-asset-analyzer
+auth_type: none
+init_required: false
+required_params: []
+setup_steps: []
+execute_mode: sample
+assert_type: rubric
+score_threshold: 0.8
+enabled: true
+

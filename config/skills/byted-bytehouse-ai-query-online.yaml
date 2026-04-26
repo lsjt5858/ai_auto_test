@@ -1,0 +1,18 @@
+skill_name: byted-bytehouse-ai-query-online
+skill_type: database_script
+base_url: script://临时添加的文件，仅供参考/byted-bytehouse-ai-query/scripts/execute_sql.py
+auth_type: none
+init_required: false
+required_params:
+  - BYTEHOUSE_HOST
+  - BYTEHOUSE_PORT
+  - BYTEHOUSE_USER
+  - BYTEHOUSE_PASSWORD
+setup_steps: []
+execute_mode: script
+script_args:
+  - "{question}"
+assert_type: keyword
+score_threshold: 1.0
+enabled: true
+

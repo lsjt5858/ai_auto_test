@@ -12,6 +12,7 @@ except ModuleNotFoundError:  # pragma: no cover
 from core.client import SkillClient
 from core.evaluator import Evaluator
 from core.loader import load_cases
+from core.runtime_params import RuntimeParams
 from core.setup_manager import SetupManager
 from core.skill_manager import SkillManager
 
@@ -36,6 +37,11 @@ def evaluator() -> Evaluator:
     return Evaluator()
 
 
+@pytest.fixture(scope="session")
+def runtime_params() -> RuntimeParams:
+    return RuntimeParams()
+
+
 def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
     if "case" in metafunc.fixturenames:
         cases = load_cases()
@@ -46,4 +52,3 @@ def attach_json(name: str, value: object) -> None:
     text = json.dumps(value, ensure_ascii=False, indent=2, default=str)
     if allure:
         allure.attach(text, name=name, attachment_type=allure.attachment_type.JSON)
-
