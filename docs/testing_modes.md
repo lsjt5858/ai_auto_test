@@ -65,6 +65,18 @@ required_params:
 
 当前 `byted-bytehouse-ai-query-online` 跑的就是这个模式。
 
+更通用的本地脚本测试配置是：
+
+```text
+config/skills/byted-bytehouse-ai-query-local-script.yaml
+```
+
+示例 case：
+
+```text
+data/byted_bytehouse_ai_query_local_script_cases.csv
+```
+
 实际执行脚本是：
 
 ```text
@@ -251,6 +263,17 @@ venv/bin/python tools/junit_to_html.py \
 reports/bytehouse_ai_query_online_report.html
 ```
 
+新的推荐报告命令：
+
+```bash
+venv/bin/python run.py \
+  --case-file data/byted_bytehouse_ai_query_local_script_cases.csv \
+  --runtime-params "临时添加的文件，仅供参考/account.md" \
+  -m smoke \
+  --html-report reports/local_script_report.html \
+  --report-title "Local Script Test Report"
+```
+
 ## 5. 下一步如果要做 OpenClaw E2E
 
 需要先补一个新的执行器，例如：
@@ -279,4 +302,3 @@ required_params:
 ```
 
 但这一步需要 OpenClaw 的自动化调用方式。如果 OpenClaw 有 CLI/API/Web UI 入口，框架就可以继续接。
-

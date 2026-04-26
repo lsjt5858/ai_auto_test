@@ -8,6 +8,24 @@
 /Users/apple1/AI_Code/ai_auto_test/docs/testing_modes.md
 ```
 
+本地脚本测试说明：
+
+```text
+/Users/apple1/AI_Code/ai_auto_test/docs/local_script_testing.md
+```
+
+Text2SQL 测试说明：
+
+```text
+/Users/apple1/AI_Code/ai_auto_test/docs/text2sql_testing.md
+```
+
+报告说明：
+
+```text
+/Users/apple1/AI_Code/ai_auto_test/docs/reporting.md
+```
+
 ## 1. 当前框架核心路径
 
 项目根目录：

@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 
 from core.assertion import assert_evaluation_passed
+from core.reporting import record_case_result
 from testcases.conftest import attach_json
 
 
@@ -15,6 +16,7 @@ def test_skill_smoke(case, skill_manager, setup_manager, skill_client, evaluator
 
     response = skill_client.execute(skill, case, context)
     result = evaluator.evaluate(skill, case, response)
+    record_case_result(case, skill, context, response, result)
 
     attach_json("skill_config", skill.raw)
     attach_json("input_params", context)

@@ -1,0 +1,5 @@
+case_id,skill,script,script_args,input,expected_answer,keywords,forbidden_words,assert_type,score_threshold,priority
+LOCAL_001,byted-bytehouse-ai-query-local-script,execute_sql.py,"{question}",SELECT 1,1,1,Error,keyword,1.0,P0
+LOCAL_002,byted-bytehouse-ai-query-local-script,list_tables.py,--databases,列出数据库,system,system,Error,keyword,1.0,P0
+LOCAL_003,byted-bytehouse-ai-query-local-script,execute_sql.py,"{question}",SHOW DATABASES,system,system,Error,keyword,1.0,P0
+

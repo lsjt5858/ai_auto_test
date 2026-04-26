@@ -12,9 +12,14 @@ except ModuleNotFoundError:  # pragma: no cover
 from core.client import SkillClient
 from core.evaluator import Evaluator
 from core.loader import load_cases
+from core.reporting import mask_sensitive, reset_report_file
 from core.runtime_params import RuntimeParams
 from core.setup_manager import SetupManager
 from core.skill_manager import SkillManager
+
+
+def pytest_sessionstart(session: pytest.Session) -> None:
+    reset_report_file()
 
 
 @pytest.fixture(scope="session")
@@ -49,6 +54,6 @@ def pytest_generate_tests(metafunc: pytest.Metafunc) -> None:
 
 
 def attach_json(name: str, value: object) -> None:
-    text = json.dumps(value, ensure_ascii=False, indent=2, default=str)
+    text = json.dumps(mask_sensitive(value), ensure_ascii=False, indent=2, default=str)
     if allure:
         allure.attach(text, name=name, attachment_type=allure.attachment_type.JSON)

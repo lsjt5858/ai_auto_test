@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import shlex
 import subprocess
 import sys
 import time
@@ -68,19 +69,22 @@ class SkillClient:
 
     def _execute_script(self, skill: SkillConfig, case: TestCase, context: dict[str, Any]) -> SkillResponse:
         script_ref = skill.base_url.removeprefix("script://")
-        script_path = Path(script_ref)
-        if not script_path.is_absolute():
-            script_path = ROOT_DIR / script_path
-
         format_values = dict(case.raw)
         format_values.update(context)
         format_values["question"] = case.question
+        script_ref = script_ref.format(**format_values)
+        script_path = Path(script_ref)
+        if not script_path.is_absolute():
+            script_path = ROOT_DIR / script_path
 
         command = list(skill.raw.get("command", [sys.executable, str(script_path)]))
         command = [part.format(**format_values) for part in command]
         if not skill.raw.get("command"):
             command = [sys.executable, str(script_path)]
-        command.extend(str(arg).format(**format_values) for arg in skill.raw.get("script_args", []))
+        script_args = []
+        script_args.extend(_as_args(skill.raw.get("script_args", [])))
+        script_args.extend(_as_args(case.raw.get("script_args", [])))
+        command.extend(str(arg).format(**format_values) for arg in script_args)
 
         env = os.environ.copy()
         env.update({key: str(value) for key, value in context.items() if value not in (None, "")})
@@ -132,3 +136,11 @@ class SkillClient:
             retrievals=list(data.get("retrievals", [])),
             tool_calls=list(data.get("tool_calls", [])),
         )
+
+
+def _as_args(value: Any) -> list[str]:
+    if value in (None, ""):
+        return []
+    if isinstance(value, list):
+        return [str(item) for item in value if str(item)]
+    return shlex.split(str(value))

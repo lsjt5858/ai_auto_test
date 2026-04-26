@@ -1,0 +1,4 @@
+case_id,skill,input,script_args,expected_answer,keywords,regex_patterns,forbidden_words,assert_type,score_threshold,priority
+TEXT2SQL_001,byted-bytehouse-ai-query-text2sql,查询 nation 表一共有多少条数据,"{question} TPC_H.nation",SELECT COUNT,SELECT,COUNT|count,Error,keyword+regex,0.8,P0
+TEXT2SQL_002,byted-bytehouse-ai-query-text2sql,查询 nation 表前 5 条记录,"{question} TPC_H.nation",SELECT,SELECT,LIMIT 5|limit 5,Error,keyword+regex,0.8,P1
+
