@@ -33,3 +33,4 @@ reports/allure-results/
 reports/allure-report/
 
 docs/
+.claude/

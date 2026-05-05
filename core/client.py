@@ -88,6 +88,14 @@ class SkillClient:
 
         env = os.environ.copy()
         env.update({key: str(value) for key, value in context.items() if value not in (None, "")})
+        env.update(
+            {
+                "AI_TEST_CASE_ID": case.case_id,
+                "AI_TEST_SKILL_NAME": case.skill_name,
+                "AI_TEST_QUESTION": case.question,
+                "AI_TEST_EXPECTED_ANSWER": case.expected_answer,
+            }
+        )
         completed = subprocess.run(
             command,
             cwd=str(script_path.parent),

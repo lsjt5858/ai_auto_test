@@ -48,9 +48,9 @@ def _to_case(record: dict[str, Any]) -> TestCase:
         question=str(normalized["question"]),
         expected_answer=str(normalized.get("expected_answer", "")),
         input_params=_as_dict(normalized.get("input_params", {})),
-        keywords=_as_list(normalized.get("keywords", [])),
+        keywords=_as_list(normalized.get("keywords", []), separators=(",", "|")),
         regex_patterns=_as_list(normalized.get("regex_patterns", [])),
-        forbidden_words=_as_list(normalized.get("forbidden_words", [])),
+        forbidden_words=_as_list(normalized.get("forbidden_words", []), separators=(",", "|")),
         assert_type=str(normalized.get("assert_type", "")),
         score_threshold=float(normalized["score_threshold"]) if normalized.get("score_threshold") not in (None, "") else None,
         enabled=_as_bool(normalized.get("enabled", True)),
@@ -98,12 +98,15 @@ def _normalize_record(record: dict[str, Any]) -> dict[str, Any]:
     return normalized
 
 
-def _as_list(value: Any) -> list[str]:
+def _as_list(value: Any, separators: tuple[str, ...] = (",",)) -> list[str]:
     if value is None:
         return []
     if isinstance(value, list):
         return [str(item) for item in value if str(item)]
-    return [item.strip() for item in str(value).split(",") if item.strip()]
+    text = str(value)
+    for separator in separators:
+        text = text.replace(separator, "\n")
+    return [item.strip() for item in text.splitlines() if item.strip()]
 
 
 def _as_dict(value: Any) -> dict[str, Any]:

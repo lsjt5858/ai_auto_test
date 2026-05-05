@@ -62,6 +62,7 @@ def _env_runtime_params() -> dict[str, Any]:
         "BYTEHOUSE_PORT",
         "BYTEHOUSE_USER",
         "BYTEHOUSE_PASSWORD",
+        "BYTEHOUSE_DATABASE",
         "BYTEHOUSE_SECURE",
         "BYTEHOUSE_VERIFY",
         "KB_ID",
