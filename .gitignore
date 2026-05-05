@@ -31,3 +31,5 @@ reports/
 # Test reports
 reports/allure-results/
 reports/allure-report/
+
+docs/

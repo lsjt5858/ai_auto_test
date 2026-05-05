@@ -8,6 +8,7 @@ required_params:
   - BYTEHOUSE_PORT
   - BYTEHOUSE_USER
   - BYTEHOUSE_PASSWORD
+  - ENV
 setup_steps: []
 execute_mode: script
 script_args:
@@ -15,4 +16,3 @@ script_args:
 assert_type: keyword
 score_threshold: 1.0
 enabled: true
-
