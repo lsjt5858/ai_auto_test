@@ -14,6 +14,8 @@ SENSITIVE_PATTERNS = (
     "SECRET",
     "API_KEY",
     "ACCESS_KEY",
+    "PRIVATE_KEY",
+    "PASSPHRASE",
     "SECRET_KEY",
     "AUTHORIZATION",
 )

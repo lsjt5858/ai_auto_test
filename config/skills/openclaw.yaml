@@ -1,0 +1,19 @@
+skill_name: openclaw
+skill_type: remote_execution
+base_url: openclaw://arkclaw
+auth_type: ssh
+init_required: true
+required_params:
+  - OPENCLAW_HOST
+  - OPENCLAW_USERNAME
+setup_steps:
+  - create_session
+execute_mode: openclaw_agent
+assert_type: keyword
+score_threshold: 0.8
+enabled: true
+openclaw_mode: agent
+agent_name: main
+agent_task_template: "{question}"
+agent_timeout_seconds: 180
+command_timeout_seconds: 300

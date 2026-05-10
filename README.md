@@ -1169,3 +1169,37 @@ allure open reports/allure-report
 如果新 Skill 有特殊初始化动作，再扩展 `core/setup_manager.py`。
 
 如果新 Skill 需要新的判断方式，再扩展 `evaluators/`，并在 `core/evaluator.py` 中注册策略。
+
+### 19.4 OpenClaw 平台接入
+
+项目已内置 `openclaw` 平台配置，使用 `openclaw://arkclaw` 协议通过 SSH 登录火山引擎 ArkClaw 机器，并在远程调用 `openclaw agent --agent main -m ... --json` 逐条执行接口测试 Case。
+
+必填运行参数：
+
+- `OPENCLAW_HOST`：ArkClaw 机器 IP 或域名
+- `OPENCLAW_USERNAME`：登录用户名
+- `OPENCLAW_PASSWORD`：密码登录时填写
+- `OPENCLAW_PRIVATE_KEY_FILE` 或 `OPENCLAW_PRIVATE_KEY`：密钥登录时填写，可替代密码
+
+建议安全参数：
+
+- `OPENCLAW_PORT`：SSH 端口，默认 `22`
+- `OPENCLAW_KNOWN_HOSTS`：可信 host key 文件，默认读取系统 `known_hosts`
+- `OPENCLAW_STRICT_HOST_KEY`：是否严格校验 host key，默认 `true`
+- `OPENCLAW_CONNECT_TIMEOUT`：登录超时时间，默认跟随框架超时
+- `OPENCLAW_COMMAND_TIMEOUT`：远程命令执行超时时间，建议 `300`
+- `OPENCLAW_MODE`：执行模式，默认 `agent`
+- `OPENCLAW_AGENT_NAME`：远程 Agent 名称，默认 `main`
+- `OPENCLAW_AGENT_TIMEOUT`：单条 Agent 任务超时时间，默认 `180`
+
+运行参数可以写入 `config/runtime_params.example.json` 同结构文件，并通过命令传入：
+
+```bash
+venv/bin/python run.py \
+  --runtime-params config/runtime_params.openclaw.json \
+  --case-file data/templates/openclaw_cases.json \
+  -m smoke \
+  --html-report reports/openclaw.html
+```
+
+用例中可通过 `input_params.openclaw_task` 指定发送给远程 Agent 的自然语言测试任务；如果未指定，则默认发送 `question` 字段。框架会提取 `result.payloads[].text` 作为断言内容，并把完整 `stdout`、`stderr`、退出码、Agent JSON、耗时等写入报告，同时自动脱敏密码、token、私钥和 passphrase。

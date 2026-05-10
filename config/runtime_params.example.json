@@ -18,6 +18,20 @@
       "BYTEHOUSE_PASSWORD": "replace-me",
       "BYTEHOUSE_SECURE": "true",
       "BYTEHOUSE_VERIFY": "true"
+    },
+    "openclaw": {
+      "OPENCLAW_HOST": "10.0.0.1",
+      "OPENCLAW_PORT": "22",
+      "OPENCLAW_USERNAME": "arkclaw",
+      "OPENCLAW_PASSWORD": "replace-me-or-use-private-key",
+      "OPENCLAW_PRIVATE_KEY_FILE": "",
+      "OPENCLAW_KNOWN_HOSTS": "~/.ssh/known_hosts",
+      "OPENCLAW_STRICT_HOST_KEY": "true",
+      "OPENCLAW_CONNECT_TIMEOUT": "30",
+      "OPENCLAW_COMMAND_TIMEOUT": "300",
+      "OPENCLAW_MODE": "agent",
+      "OPENCLAW_AGENT_NAME": "main",
+      "OPENCLAW_AGENT_TIMEOUT": "180"
     }
   }
 }
