@@ -80,8 +80,5 @@ def _env_runtime_params() -> dict[str, Any]:
         "OPENCLAW_STRICT_HOST_KEY",
         "OPENCLAW_CONNECT_TIMEOUT",
         "OPENCLAW_COMMAND_TIMEOUT",
-        "OPENCLAW_MODE",
-        "OPENCLAW_AGENT_NAME",
-        "OPENCLAW_AGENT_TIMEOUT",
     ]
     return {key: os.getenv(key) for key in keys if os.getenv(key)}

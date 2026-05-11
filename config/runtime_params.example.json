@@ -28,10 +28,7 @@
       "OPENCLAW_KNOWN_HOSTS": "~/.ssh/known_hosts",
       "OPENCLAW_STRICT_HOST_KEY": "true",
       "OPENCLAW_CONNECT_TIMEOUT": "30",
-      "OPENCLAW_COMMAND_TIMEOUT": "300",
-      "OPENCLAW_MODE": "agent",
-      "OPENCLAW_AGENT_NAME": "main",
-      "OPENCLAW_AGENT_TIMEOUT": "180"
+      "OPENCLAW_COMMAND_TIMEOUT": "120"
     }
   }
 }

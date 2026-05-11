@@ -8,12 +8,9 @@ required_params:
   - OPENCLAW_USERNAME
 setup_steps:
   - create_session
-execute_mode: openclaw_agent
+execute_mode: remote_command
 assert_type: keyword
 score_threshold: 0.8
 enabled: true
-openclaw_mode: agent
-agent_name: main
-agent_task_template: "{question}"
-agent_timeout_seconds: 180
-command_timeout_seconds: 300
+command_template: "{question}"
+command_timeout_seconds: 120

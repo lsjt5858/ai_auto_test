@@ -3,13 +3,13 @@
     "case_id": "OPENCLAW_SMOKE_001",
     "skill_name": "openclaw",
     "module": "openclaw",
-    "scenario": "OpenClaw Agent 健康检查",
+    "scenario": "远程连通性检查",
     "input_params": {
-      "openclaw_task": "请在当前远程机器上执行接口测试命令：curl -sS -i http://127.0.0.1:18789/health。请返回完整 HTTP 响应，并判断是否包含 ok:true。"
+      "openclaw_command": "hostname && whoami"
     },
-    "question": "检查 OpenClaw Gateway 健康状态",
-    "expected_answer": "OpenClaw Gateway health 返回 200 且 ok 为 true",
-    "keywords": ["HTTP/1.1 200 OK", "\"ok\":true", "健康检查通过"],
+    "question": "hostname && whoami",
+    "expected_answer": "返回 ArkClaw 机器主机名和当前登录用户",
+    "keywords": ["arkclaw"],
     "assert_type": "keyword",
     "score_threshold": 0.8,
     "enabled": false,
@@ -19,14 +19,14 @@
     "case_id": "OPENCLAW_REG_001",
     "skill_name": "openclaw",
     "module": "openclaw",
-    "scenario": "接口测试 Agent 用例模板",
+    "scenario": "执行指定测试命令",
     "input_params": {
-      "openclaw_task": "请在当前远程机器上执行接口测试命令：curl -sS -i http://127.0.0.1:8080/。请返回完整 HTTP 响应，并判断是否为 SearXNG 首页。"
+      "openclaw_command": "cd /path/to/project && python -m pytest -q"
     },
-    "question": "检查 8080 服务首页",
-    "expected_answer": "8080 服务返回 SearXNG 首页",
-    "keywords": ["HTTP/1.1 200 OK", "SearXNG"],
-    "forbidden_words": ["Connection refused"],
+    "question": "执行 ArkClaw 机器上的 pytest 回归用例",
+    "expected_answer": "pytest 执行通过",
+    "keywords": ["passed"],
+    "forbidden_words": ["failed", "error"],
     "assert_type": "keyword",
     "score_threshold": 0.8,
     "enabled": false,

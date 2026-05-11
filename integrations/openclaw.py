@@ -1,9 +1,7 @@
 from __future__ import annotations
 
 import io
-import json
 import re
-import shlex
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -61,13 +59,12 @@ class OpenClawExecutor:
                 },
             )
 
-        parsed = _parse_agent_json(stdout_text) if _is_agent_mode(skill, context) else {}
-        answer = _extract_agent_answer(parsed) or stdout_text.strip() or stderr_text.strip()
+        answer = stdout_text.strip() or stderr_text.strip()
         if exit_status == 0 and not answer:
             answer = "openclaw remote command completed successfully"
 
         return OpenClawResult(
-            success=exit_status == 0 and str(parsed.get("status", "ok")).lower() != "error",
+            success=exit_status == 0,
             answer=answer,
             status_code=exit_status,
             request_id=uuid4().hex,
@@ -76,7 +73,6 @@ class OpenClawExecutor:
                 "stdout": stdout_text,
                 "stderr": stderr_text,
                 "exit_status": exit_status,
-                "agent_json": parsed,
                 "host": host,
                 "port": port,
                 "username": username,
@@ -125,9 +121,6 @@ class OpenClawExecutor:
         return client
 
     def _build_command(self, skill: Any, case: Any, context: dict[str, Any]) -> str:
-        if _is_agent_mode(skill, context):
-            return self._build_agent_command(skill, case, context)
-
         values = dict(context)
         values.update(getattr(case, "raw", {}))
         values["question"] = getattr(case, "question", "")
@@ -143,45 +136,6 @@ class OpenClawExecutor:
             or "{question}"
         )
         return _format_known_placeholders(str(command), values)
-
-    def _build_agent_command(self, skill: Any, case: Any, context: dict[str, Any]) -> str:
-        values = dict(context)
-        values.update(getattr(case, "raw", {}))
-        values["question"] = getattr(case, "question", "")
-
-        message = (
-            getattr(case, "input_params", {}).get("openclaw_task")
-            or getattr(case, "input_params", {}).get("agent_message")
-            or getattr(case, "raw", {}).get("openclaw_task")
-            or getattr(case, "raw", {}).get("agent_message")
-            or skill.raw.get("agent_task_template")
-            or "{question}"
-        )
-        message = _format_known_placeholders(str(message), values)
-        agent_name = str(context.get("OPENCLAW_AGENT_NAME") or skill.raw.get("agent_name") or "main")
-        agent_timeout = int(
-            float(
-                context.get("OPENCLAW_AGENT_TIMEOUT")
-                or context.get("OPENCLAW_COMMAND_TIMEOUT")
-                or skill.raw.get("agent_timeout_seconds")
-                or skill.raw.get("command_timeout_seconds")
-                or 180
-            )
-        )
-
-        return " ".join(
-            [
-                "openclaw",
-                "agent",
-                "--agent",
-                shlex.quote(agent_name),
-                "-m",
-                shlex.quote(message),
-                "--timeout",
-                str(agent_timeout),
-                "--json",
-            ]
-        )
 
 
 def _load_private_key(paramiko: Any, context: dict[str, Any]) -> Any:
@@ -227,28 +181,3 @@ def _format_known_placeholders(command: str, values: dict[str, Any]) -> str:
         return str(values.get(key, match.group(0)))
 
     return re.sub(r"\{([A-Za-z_][A-Za-z0-9_]*)\}", replace, command)
-
-
-def _is_agent_mode(skill: Any, context: dict[str, Any]) -> bool:
-    mode = context.get("OPENCLAW_MODE") or getattr(skill, "raw", {}).get("openclaw_mode")
-    return str(mode or "").strip().lower() == "agent"
-
-
-def _parse_agent_json(stdout_text: str) -> dict[str, Any]:
-    decoder = json.JSONDecoder()
-    for index, char in enumerate(stdout_text):
-        if char != "{":
-            continue
-        try:
-            value, _ = decoder.raw_decode(stdout_text[index:])
-        except json.JSONDecodeError:
-            continue
-        if isinstance(value, dict) and ("result" in value or "status" in value):
-            return value
-    return {}
-
-
-def _extract_agent_answer(agent_json: dict[str, Any]) -> str:
-    payloads = agent_json.get("result", {}).get("payloads", []) if agent_json else []
-    texts = [str(item.get("text", "")).strip() for item in payloads if isinstance(item, dict) and item.get("text")]
-    return "\n\n".join(text for text in texts if text)

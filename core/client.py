@@ -15,13 +15,11 @@ from tenacity import retry, stop_after_attempt, wait_fixed
 from config.settings import ROOT_DIR
 from config.settings import settings
 from core.models import SkillConfig, SkillResponse, TestCase
-from integrations.openclaw import OpenClawExecutor
 
 
 class SkillClient:
     def __init__(self, timeout_seconds: float | None = None) -> None:
         self.timeout_seconds = timeout_seconds or settings.timeout_seconds
-        self.openclaw_executor = OpenClawExecutor()
 
     def execute(self, skill: SkillConfig, case: TestCase, context: dict[str, Any]) -> SkillResponse:
         started = time.perf_counter()
@@ -31,8 +29,6 @@ class SkillClient:
             response = self._execute_sample(case, context)
         elif skill.base_url.startswith("mock://"):
             response = self._execute_mock(skill, case, context)
-        elif skill.base_url.startswith("openclaw://"):
-            response = self._execute_openclaw(skill, case, context)
         else:
             response = self._execute_http(skill, case, context)
         latency_ms = (time.perf_counter() - started) * 1000
@@ -122,16 +118,6 @@ class SkillClient:
                 "stderr": completed.stderr,
                 "returncode": completed.returncode,
             },
-        )
-
-    def _execute_openclaw(self, skill: SkillConfig, case: TestCase, context: dict[str, Any]) -> SkillResponse:
-        result = self.openclaw_executor.execute(skill, case, context)
-        return SkillResponse(
-            success=result.success,
-            answer=result.answer,
-            status_code=result.status_code,
-            request_id=result.request_id,
-            raw=result.raw,
         )
 
     @retry(stop=stop_after_attempt(2), wait=wait_fixed(1))

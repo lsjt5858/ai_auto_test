@@ -91,7 +91,7 @@ def _render(title: str, records: list[dict[str, Any]]) -> str:
   <meta charset="utf-8">
   <title>{_e(title)}</title>
   <style>
-    :root {{ --green:#8bc75a; --red:#e05d44; --gray:#a3a3a3; --dark:#303030; --blue:#2d9cdb; }}
+    :root {{ --green:#78c943; --red:#e25544; --gray:#a3a3a3; --dark:#303030; --blue:#2477bd; --amber:#f7b955; }}
     * {{ box-sizing: border-box; }}
     body {{ margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Arial,sans-serif; color:#222; background:#fff; }}
     aside {{ position:fixed; left:0; top:0; bottom:0; width:230px; background:#303030; color:#fff; padding:24px 22px; }}
@@ -117,9 +117,28 @@ def _render(title: str, records: list[dict[str, Any]]) -> str:
     th {{ background:#f7f7f7; }}
     .status-passed {{ color:#087f4f; font-weight:700; }}
     .status-failed {{ color:#b42318; font-weight:700; }}
-    details summary {{ cursor:pointer; color:#1f5e9d; }}
-    pre {{ white-space:pre-wrap; max-height:260px; overflow:auto; margin:8px 0 0; background:#fafafa; padding:10px; border:1px solid #eee; }}
+    .status-skipped {{ color:#7a5d00; font-weight:700; }}
+    .badge {{ display:inline-block; padding:3px 8px; border-radius:999px; font-size:12px; font-weight:700; color:#fff; }}
+    .badge-passed {{ background:var(--green); }}
+    .badge-failed {{ background:var(--red); }}
+    .badge-skipped {{ background:var(--amber); }}
+    .badge-unknown {{ background:var(--gray); }}
+    details summary {{ cursor:pointer; color:#1f5e9d; font-weight:600; }}
+    pre {{ white-space:pre-wrap; max-height:360px; overflow:auto; margin:8px 0 0; background:#fafafa; padding:10px; border:1px solid #eee; }}
     .sidepanel {{ height:270px; display:flex; align-items:center; justify-content:center; color:#777; font-size:20px; }}
+    .case-card {{ background:#fcfcfc; border:1px solid #eee; margin-top:12px; padding:14px; }}
+    .case-grid {{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:12px; }}
+    .case-block {{ border:1px solid #e8e8e8; background:#fff; padding:12px; }}
+    .case-block h4 {{ margin:0 0 8px; font-size:14px; color:#555; }}
+    .case-text {{ white-space:pre-wrap; max-height:260px; overflow:auto; line-height:1.55; }}
+    .reason {{ margin-top:10px; padding:10px; border-left:4px solid #ddd; background:#fff; }}
+    .reason.failed {{ border-left-color:var(--red); }}
+    .reason.passed {{ border-left-color:var(--green); }}
+    .assertions {{ margin-top:12px; }}
+    .assertions table {{ margin-top:8px; }}
+    .mini {{ font-size:12px; color:#777; }}
+    .mono {{ font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }}
+    .input-preview,.output-preview {{ max-width:420px; max-height:96px; overflow:hidden; white-space:pre-wrap; line-height:1.45; }}
   </style>
 </head>
 <body>
@@ -151,7 +170,7 @@ def _render(title: str, records: list[dict[str, Any]]) -> str:
     <section class="panel" style="margin-top:22px; padding:22px;">
       <div class="section-title" style="padding:0 0 16px;">CASE DETAILS</div>
       <table>
-        <thead><tr><th>Status</th><th>Case ID</th><th>Skill</th><th>Input</th><th>Score</th><th>Details</th></tr></thead>
+        <thead><tr><th>Status</th><th>Case ID</th><th>Skill</th><th>Input</th><th>Output</th><th>Score</th><th>Pass 判断</th><th>Details</th></tr></thead>
         <tbody>{case_rows}</tbody>
       </table>
     </section>
@@ -177,24 +196,113 @@ def _case_row(record: dict[str, Any], index: int) -> str:
     status = record.get("status", "unknown")
     evaluation = record.get("evaluation", {})
     response = record.get("response", {})
-    detail = {
-        "expected_answer": record.get("expected_answer"),
-        "actual_answer": response.get("answer"),
+    actual_answer = response.get("answer", "")
+    expected_answer = record.get("expected_answer", "")
+    reason = evaluation.get("reason", "")
+    assertions = evaluation.get("assertions", [])
+    raw_detail = {
+        "case_id": record.get("case_id"),
+        "status": status,
+        "input": record.get("question"),
+        "expected_answer": expected_answer,
+        "actual_answer": actual_answer,
         "evaluation": evaluation,
+        "context": record.get("context"),
         "raw_case": record.get("raw_case"),
-        "command": response.get("raw", {}).get("command"),
+        "response_raw": response.get("raw", {}),
     }
     score = evaluation.get("score", "")
     if isinstance(score, float):
         score = f"{score:.2f}"
+    threshold = record.get("score_threshold", "")
+    status_badge = f'<span class="badge badge-{_e(status)}">{_e(status)}</span>'
+    details_html = _case_detail_html(record, actual_answer, expected_answer, assertions, reason, raw_detail, status)
     return f"""<tr>
-      <td class="status-{_e(status)}">{_e(status)}</td>
+      <td class="status-{_e(status)}">{status_badge}</td>
       <td>{_e(record.get("case_id", ""))}</td>
       <td>{_e(record.get("skill_name", ""))}<br><span class="muted">{_e(record.get("execute_mode", ""))}</span></td>
-      <td>{_e(record.get("question", ""))}</td>
-      <td>{_e(str(score))}</td>
-      <td><details><summary>查看详情</summary><pre>{_e(json.dumps(detail, ensure_ascii=False, indent=2, default=str))}</pre></details></td>
+      <td><div class="input-preview">{_e(record.get("question", ""))}</div></td>
+      <td><div class="output-preview">{_e(_short(actual_answer, 360))}</div></td>
+      <td><span class="mono">{_e(str(score))}</span><br><span class="mini">threshold: {_e(str(threshold))}</span></td>
+      <td>{_e(_short(reason or ("passed" if status == "passed" else ""), 260))}</td>
+      <td><details><summary>查看详情</summary>{details_html}</details></td>
     </tr>"""
+
+
+def _case_detail_html(
+    record: dict[str, Any],
+    actual_answer: Any,
+    expected_answer: Any,
+    assertions: list[dict[str, Any]],
+    reason: Any,
+    raw_detail: dict[str, Any],
+    status: str,
+) -> str:
+    assertion_rows = "\n".join(_assertion_row(item) for item in assertions) or "<tr><td colspan=\"4\">无断言明细</td></tr>"
+    command = record.get("response", {}).get("raw", {}).get("command", "")
+    context = record.get("context", {})
+    return f"""
+      <div class="case-card">
+        <div><b>Case:</b> {_e(record.get("case_id", ""))} · <b>Assert:</b> {_e(record.get("assert_type", ""))}</div>
+        <div class="reason {_e(status)}"><b>通过/失败依据：</b>{_e(reason or ("passed" if status == "passed" else ""))}</div>
+        <div class="case-grid">
+          <div class="case-block">
+            <h4>输入 Input</h4>
+            <div class="case-text">{_e(record.get("question", ""))}</div>
+          </div>
+          <div class="case-block">
+            <h4>期望 Expected</h4>
+            <div class="case-text">{_e(expected_answer)}</div>
+          </div>
+          <div class="case-block">
+            <h4>实际输出 Actual</h4>
+            <div class="case-text">{_e(actual_answer)}</div>
+          </div>
+          <div class="case-block">
+            <h4>执行上下文 Context</h4>
+            <pre>{_e(json.dumps(context, ensure_ascii=False, indent=2, default=str))}</pre>
+          </div>
+        </div>
+        <div class="assertions">
+          <b>断言明细 Assertions</b>
+          <table>
+            <thead><tr><th>Type</th><th>Passed</th><th>Score</th><th>Detail</th></tr></thead>
+            <tbody>{assertion_rows}</tbody>
+          </table>
+        </div>
+        <div class="case-grid">
+          <div class="case-block">
+            <h4>执行命令 Command</h4>
+            <pre>{_e(json.dumps(command, ensure_ascii=False, indent=2, default=str))}</pre>
+          </div>
+          <div class="case-block">
+            <h4>原始明细 Raw Detail</h4>
+            <pre>{_e(json.dumps(raw_detail, ensure_ascii=False, indent=2, default=str))}</pre>
+          </div>
+        </div>
+      </div>
+    """
+
+
+def _assertion_row(item: dict[str, Any]) -> str:
+    score = item.get("score", "")
+    if isinstance(score, float):
+        score = f"{score:.2f}"
+    passed = item.get("passed")
+    status = "passed" if passed else "failed"
+    return f"""<tr>
+      <td>{_e(item.get("type", ""))}</td>
+      <td><span class="badge badge-{status}">{_e(status)}</span></td>
+      <td class="mono">{_e(str(score))}</td>
+      <td>{_e(item.get("detail", ""))}</td>
+    </tr>"""
+
+
+def _short(value: Any, limit: int) -> str:
+    text = str(value or "")
+    if len(text) <= limit:
+        return text
+    return text[:limit] + "..."
 
 
 def _e(value: Any) -> str:
