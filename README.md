@@ -1161,10 +1161,27 @@ allure open reports/allure-report
 
 ### 19.3 新 Skill 接入方式
 
-新增一个 Skill 时，优先只改两类文件：
+新增一个 Skill 时，优先只改三类文件：
 
-1. 在 `config/skills/` 下新增一份 Skill 配置，例如 `report_query.yaml`
-2. 在 `data/skill_cases.json` 中增加该 Skill 的测试 case
+1. 在根目录 `skills/<skill_name>/` 下放 Skill 代码、脚本和说明文档
+2. 在 `config/skills/` 下新增一份 Skill 配置，例如 `report_query.yaml`
+3. 在 `data/` 下增加该 Skill 的测试 case 文件
+
+推荐目录规范：
+
+```text
+skills/
+  <skill_name>/
+    scripts/
+    README.md
+    SKILL.md
+config/skills/
+  <skill_name>.yaml
+data/
+  <skill_name>_cases.csv
+```
+
+其中 `config/临时添加的文件，仅供参考/` 不参与框架加载，真正生效的只有 `config/skills/`。
 
 如果新 Skill 有特殊初始化动作，再扩展 `core/setup_manager.py`。
 

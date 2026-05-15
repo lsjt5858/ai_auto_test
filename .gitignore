@@ -27,6 +27,7 @@ config/runtime_params.local.json
 reports/
 
 临时添加的文件，仅供参考/
+skills/*/scripts/output/
 
 # Test reports
 reports/allure-results/

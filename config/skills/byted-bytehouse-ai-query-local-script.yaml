@@ -1,6 +1,6 @@
 skill_name: byted-bytehouse-ai-query-local-script
 skill_type: local_script
-base_url: script://临时添加的文件，仅供参考/byted-bytehouse-ai-query/scripts/{script}
+base_url: script://skills/byted-bytehouse-ai-query/scripts/{script}
 auth_type: none
 init_required: false
 required_params:
@@ -13,4 +13,3 @@ execute_mode: script
 assert_type: keyword
 score_threshold: 1.0
 enabled: true
-

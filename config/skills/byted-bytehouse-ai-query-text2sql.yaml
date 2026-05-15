@@ -1,6 +1,6 @@
 skill_name: byted-bytehouse-ai-query-text2sql
 skill_type: text2sql
-base_url: script://临时添加的文件，仅供参考/byted-bytehouse-ai-query/scripts/text2sql.py
+base_url: script://skills/byted-bytehouse-ai-query/scripts/text2sql.py
 auth_type: none
 init_required: false
 required_params:
@@ -11,4 +11,3 @@ execute_mode: script
 assert_type: keyword+regex
 score_threshold: 0.8
 enabled: true
-

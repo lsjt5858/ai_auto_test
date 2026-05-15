@@ -1,6 +1,6 @@
 skill_name: byted-bytehouse-data-asset-analyzer
 skill_type: data_asset_analyzer
-base_url: script://临时添加的文件，仅供参考/byted-bytehouse-data-asset-analyzer/scripts/data_asset_analyzer.py
+base_url: script://skills/byted-bytehouse-data-asset-analyzer/scripts/data_asset_analyzer.py
 auth_type: none
 init_required: false
 required_params:
