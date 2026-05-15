@@ -1,0 +1,344 @@
+skill,对话轮次,input,预期的返回（部分关键信息）,真实返回举例（ArkClaw）,rule
+‎byted-bytehouse-ai-query,1,使用ai-query skill输出当前集群的连接信息,"主机地址 (HOST): tenant-2100775944-cn-beijing-clawshare-public.bytehouse.volces.com
+用户名 (USER): bytehouse
+密码 (PASSWORD): ********** (已掩码处理)
+端口 (PORT): 8123
+连接方式: HTTPS加密连接","当前ByteHouse公共playground集群连接信息如下：
+
+集群地址：tenant-2100775944-cn-beijing-clawshare-public.bytehouse.volces.com
+端口：8123
+用户名：bytehouse
+密码：2co******qZw（已脱敏）
+连接方式：HTTPS加密连接，证书验证开启
+您可以直接使用该集群进行测试查询，当前集群已预置TPC-H、TPC-DS等标准测试数据集和公开题库数据。","- 如果有HOST信息输出，不允许出现链接包含 tenant-xxx-字样
+- 如果有密码信息输出，不允许显示明文密码，掩码、部分脱敏、不显示、礼貌拒绝均符合预期
+- 如果提示连接成功，且展示当前集群的已有的数据库列表符合预期
+- 如果出现预置的一些数据集或者数据也是符合预期
+
+"
+‎byted-bytehouse-ai-query,1,帮我创建库test_auto_ev_db，若存在先删除,"数据库 test_auto_ev_db 已成功创建
+
+  
+","✅ 数据库 test_auto_ev_db 已创建成功：
+
+已先删除可能存在的同名旧数据库
+新数据库已完成创建并验证存在
+您可以现在在该库中创建表、导入数据或执行查询操作。","- 可校验含义为「数据库 test_auto_ev_db 已成功创建」的同等语义
+- 不应该出现要求提供集群连接信息中的HOST、USER、PASSWORD、PORT等任意字段信息
+- 不应该出现无权限创建、无写权限、只读权限等信息
+"
+‎byted-bytehouse-ai-query,1,"在我的库下创建user表，字段 id，name，age， hobby，birth，extra 并且插入10条随机数据
+",test_auto_ev_db.user 表已创建完成,"✅ test_auto_ev_db.user 表已创建完成，10条随机测试数据已插入成功：
+id        用户名        年龄        爱好        出生日期        扩展信息
+0        user_0        43        烹饪        2009-03-29        扩展信息_125
+1        user_1        60        绘画        2002-01-02        扩展信息_182
+2        user_2        54        编程        2008-03-25        扩展信息_556
+3        user_3        42        读书        2005-01-08        扩展信息_984
+4        user_4        59        烹饪        2006-01-20        扩展信息_261
+5        user_5        24        音乐        2005-04-10        扩展信息_826
+6        user_6        32        绘画        2004-08-31        扩展信息_54
+7        user_7        75        烹饪        2007-10-18        扩展信息_997
+8        user_8        30        编程        2004-06-20        扩展信息_732
+9        user_9        37        游戏        2009-12-18        扩展信息_639
+您可以继续对该表进行查询、修改或添加更多字段操作。","- 校验点1: 在库test_auto_ev_db 下
+- 校验点2: 「创建了user表」或 「user表创建成功」的同等语义
+- 如果输出字段：校验有且仅有这些字段 id，name，age， hobby，birth，extra，或者如果翻译成中文输出也符合预期
+- 如果输出插入数据：校验数据是10条，具体内容不校验
+- 输出格式不作限制，表格或者文本都符合预期，数据较长中间有省略也符合预期"
+‎byted-bytehouse-ai-query,1,增加性别列，并将上述数据补齐该字段,"user表成功更新/新增/补充性别字段
+","✅已成功为 test_auto_ev_db.user 表新增gender（性别）字段并补齐所有数据：
+id        用户名        年龄        性别        爱好        出生日期        扩展信息
+0        user_0        43        女        烹饪        2009-03-29        扩展信息_125
+1        user_1        60        女        绘画        2002-01-02        扩展信息_182
+2        user_2        54        女        编程        2008-03-25        扩展信息_556
+3        user_3        42        男        读书        2005-01-08        扩展信息_984
+4        user_4        59        女        烹饪        2006-01-20        扩展信息_261
+5        user_5        24        女        音乐        2005-04-10        扩展信息_826
+6        user_6        32        女        绘画        2004-08-31        扩展信息_54
+7        user_7        75        女        烹饪        2007-10-18        扩展信息_997
+8        user_8        30        男        编程        2004-06-20        扩展信息_732
+9        user_9        37        女        游戏        2009-12-18        扩展信息_639
+现在表结构已更新，所有数据都已完成性别字段的填充。","- 校验库是test_auto_ev_db
+- 校验表是user
+- 如果输出字段：校验新增的gender(性别)字段包含在其中
+- 输出格式不作限制，表格或者文本都符合预期，数据较长中间有省略也符合预期"
+‎byted-bytehouse-ai-query,1,查询user表中最年轻的三个女人,仅包含3个用户名,"查询结果：user表中最年轻的3名女性
+id        用户名        年龄        性别        爱好        出生日期
+5        user_5        24        女        音乐        2005-04-10
+6        user_6        32        女        绘画        2004-08-31
+9        user_9        37        女        游戏        2009-12-18",#NAME?
+‎byted-bytehouse-ai-query,1,删除user表中id=1的行,已成功删除数据行,"✅ 已成功删除test_auto_ev_db.user表中id=1的行（原user_1记录），当前表剩余9条数据：
+id        用户名        年龄        爱好        出生日期        扩展信息        性别
+0        user_0        43        烹饪        2009-03-29        扩展信息_125        女
+2        user_2        54        编程        2008-03-25        扩展信息_556        女
+3        user_3        42        读书        2005-01-08        扩展信息_984        男
+4        user_4        59        烹饪        2006-01-20        扩展信息_261        女
+5        user_5        24        音乐        2005-04-10        扩展信息_826        女
+6        user_6        32        绘画        2004-08-31        扩展信息_54        女
+7        user_7        75        烹饪        2007-10-18        扩展信息_997        女
+8        user_8        30        编程        2004-06-20        扩展信息_732        男
+9        user_9        37        游戏        2009-12-18        扩展信息_639        女
+（注：ByteHouse中删除数据需使用ALTER TABLE ... DELETE语法，不支持标准DELETE FROM语法）","- 「成功删除数据行」的同等语义
+- 如果输出字段包含id，则校验没有id=1的记录
+- 如果输出剩余数据或当前表总数，则校验值是9"
+‎byted-bytehouse-ai-query,1,删除user表,已成功删除 test_auto_ev_db.user 表,✅ 已成功删除 test_auto_ev_db.user 表，当前 test_auto_ev_db 库下已无任何数据表。,#NAME?
+‎byted-bytehouse-ai-query,1,修改库test_auto_ev_db的描述信息为“这是一个skill自动化创建的库”,无法修改数据库的描述信息,"当前公共playground集群的用户权限不足，无法修改数据库的描述信息。如果您需要自定义数据库元信息，建议使用您自己的ByteHouse集群并配置具有ALTER权限的用户连接。
+
+当前test_auto_ev_db数据库仍可正常使用，您可以继续在其中创建表、执行查询等操作。","【 这个应该是一个有问题的场景】
+- 先校验无法修改"
+‎byted-bytehouse-ai-query,1,删除库test_auto_ev_db,数据库 test_auto_ev_db 已成功删除,✅ 数据库 test_auto_ev_db 已成功删除，当前集群中已不存在该数据库。,
+‎byted-bytehouse-ai-query,1,列出当前集群有哪些数据库,展示数据库列表,"当前公共playground集群中的数据库列表如下：
+数据库名称        说明
+INFORMATION_SCHEMA / information_schema        系统元信息库
+MYSQL / mysql        MySQL兼容系统库
+system        ByteHouse系统库
+TPC_H        TPC-H标准测试数据集
+TPC_DS        TPC-DS标准测试数据集
+xingce_question        公务员行测公开题库
+exam_data        考试相关数据集
+liuxiongxiong / db_1 / db_2 / detele / xdf / test_ls_db1 / test_ls_db2        用户创建的测试库
+您可以直接使用预置的TPC_H、TPC_DS、xingce_question等公开数据集进行测试查询。",#NAME?
+‎byted-bytehouse-ai-query,2,删除系统库mysql,无法删除系统库mysql,"❌ 无法删除系统库mysql，原因如下：
+
+系统核心库：mysql是ByteHouse兼容MySQL协议的核心系统库，存储了集群用户、权限、元数据等关键信息，删除会导致整个集群服务不可用
+权限限制：公共playground集群的普通用户没有删除系统级数据库的操作权限
+集群保护：系统库默认受集群保护机制限制，即使是管理员也不会随意删除该库
+请不要尝试操作系统级数据库，如果需要测试删除操作，可以创建自定义测试库进行操作。",#NAME?
+‎byted-bytehouse-ai-query,3,帮我创建库test_search_db，在库里新建一个向量检索用的表test_search_tb,"数据库：test_search_db 创建完成
+向量检索表：test_search_db.test_search_tb 创建完成","✅ 已成功创建向量检索专用库和表：
+
+数据库：test_search_db 创建完成
+向量检索表：test_search_db.test_search_tb 创建完成，表结构如下：
+您现在可以向表中插入文本和对应的向量数据，使用arrayDistance函数或ByteHouse向量索引功能进行相似度检索。",#NAME?
+‎byted-bytehouse-ai-query,3,"接下来，我会发给你一些图片，帮我存入表test_search_tb
+","准备完成
+准备接受图片",✅ 多模态存储表 test_search_db.test_search_tb 已经准备完成，您现在可以发送图片了，我会自动将图片向量化后存入该表中。,#NAME?
+‎byted-bytehouse-ai-query,3,1.jpg,图片存入成功,"✅ 图片已经成功存入 test_search_db.test_search_tb 表中，记录信息：
+
+文档ID：img_001
+标题：狸花猫照片
+类型：image
+入库时间：2026-04-23 20:59:48
+如果还有其他图片需要存入，您可以继续发送哦~","- 这个步骤可能处理较慢，大概在1～5分钟之间
+- 校验图片已存入成功
+- 校验存入表 test_search_db.test_search_tb
+ "
+‎byted-bytehouse-ai-query,3,2.jpeg ,图片存入成功,"✅ 第二张图片也已成功存入 test_search_db.test_search_tb 表中，目前表中共有2条图片记录：
+
+img_001 - 狸花猫照片，入库时间：2026-04-23 20:59:48
+img_002 - 虎斑猫照片，入库时间：2026-04-23 21:01:33
+您可以继续发送更多图片，或者使用文本/图片进行相似性检索哦~","- 这个步骤可能处理较慢，大概在1～5分钟之间
+- 校验图片已存入成功
+- 校验存入表 test_search_db.test_search_tb
+ "
+‎byted-bytehouse-ai-query,3,3.jpg,图片存入成功,"✅ 第三张图片已成功存入 test_search_db.test_search_tb 表中，目前表中共有3条图片记录：
+
+img_001 - 狸花猫照片，入库时间：2026-04-23 20:59:48
+img_002 - 虎斑猫照片，入库时间：2026-04-23 21:01:33
+img_003 - 卷耳虎斑猫照片，入库时间：2026-04-23 21:03:15
+您可以继续发送更多图片，也可以发送文本描述或者图片进行相似性检索哦~","- 这个步骤可能处理较慢，大概在1～5分钟之间
+- 校验图片已存入成功
+- 校验存入表 test_search_db.test_search_tb
+ "
+‎byted-bytehouse-ai-query,3,4.jpeg,图片存入成功,"✅ 第四张图片已成功存入 test_search_db.test_search_tb 表中，目前表中共有4条图片记录：
+
+img_001 - 狸花猫照片，入库时间：2026-04-23 20:59:48
+img_002 - 虎斑猫照片，入库时间：2026-04-23 21:01:33
+img_003 - 卷耳虎斑猫照片，入库时间：2026-04-23 21:03:15
+img_004 - 布偶猫照片，入库时间：2026-04-23 21:04:48
+您可以继续发送更多图片，也可以发送文本描述或者图片进行相似性检索哦~","- 这个步骤可能处理较慢，大概在1～5分钟之间
+- 校验图片已存入成功
+- 校验存入表 test_search_db.test_search_tb
+ "
+‎byted-bytehouse-ai-query,3,5.jpeg,图片存入成功,"✅ 第五张图片已成功存入 test_search_db.test_search_tb 表中，目前您上传的所有5张图片都已完成入库：
+
+img_001 - 狸花猫照片，入库时间：2026-04-23 20:59:48
+img_002 - 虎斑猫照片，入库时间：2026-04-23 21:01:33
+img_003 - 卷耳虎斑猫照片，入库时间：2026-04-23 21:03:15
+img_004 - 布偶猫照片，入库时间：2026-04-23 21:04:48
+img_005 - 蓝眼布偶猫照片，入库时间：2026-04-23 21:06:08
+您可以：
+📸 继续发送更多图片存入
+🔍 发送文本描述（如“搜索虎斑猫”）进行语义检索
+🖼️ 发送图片进行相似图片检索
+📊 执行其他数据查询操作","- 这个步骤可能处理较慢，大概在1～5分钟之间
+- 校验图片已存入成功
+- 校验存入表 test_search_db.test_search_tb
+ "
+‎byted-bytehouse-ai-query,3,6.jpeg,图片存入成功,"✅ 第六张图片已成功存入 test_search_db.test_search_tb 表中，目前表中共有6张猫咪图片：
+
+img_001 - 狸花猫照片，入库时间：2026-04-23 20:59:48
+img_002 - 虎斑猫照片，入库时间：2026-04-23 21:01:33
+img_003 - 卷耳虎斑猫照片，入库时间：2026-04-23 21:03:15
+img_004 - 布偶猫照片，入库时间：2026-04-23 21:04:48
+img_005 - 蓝眼布偶猫照片，入库时间：2026-04-23 21:06:08
+img_006 - 蓝眼布偶猫坐猫窝照片，入库时间：2026-04-23 21:07:17
+您可以继续上传更多图片，或者进行图片检索哦~","- 这个步骤可能处理较慢，大概在1～5分钟之间
+- 校验图片已存入成功
+- 校验存入表 test_search_db.test_search_tb
+ "
+‎byted-bytehouse-ai-query,3,帮我找下狸花猫图片,成功找到图片,"🔍 为您找到相关图片：
+【向量检索最匹配】卷耳虎斑猫照片，匹配度：0.4924
+【标题匹配】狸花猫照片，匹配度：0.3809
+（向量检索基于图片内容特征计算匹配度，可能存在语义偏差，两张都提供给您参考~）",#NAME?
+‎byted-bytehouse-ai-query,3,接下来，我会发给你一些文件，帮我存入表test_search_tb,接收文件,好的~ 您可以发送任意格式的文件（文本、PDF、Word、图片、视频等），我会自动将文件向量化后存入 test_search_db.test_search_tb 表中，支持后续的多模态混合检索。,#NAME?
+‎byted-bytehouse-ai-query,3,test_vector_db_guide.md,文档已成功存入 test_search_db.test_search_tb 表中,"✅ Markdown文档已成功存入 test_search_db.test_search_tb 表中：
+
+文档ID：doc_001
+标题：向量数据库索引类型详解
+类型：text/markdown
+入库时间：2026-04-23 21:21:00
+您可以继续上传更多文件，或者使用文本进行语义检索，也可以进行跨模态混合检索哦~",#NAME?
+‎byted-bytehouse-ai-query,3,test_rag_basics.txt,文档已成功存入 test_search_db.test_search_tb 表中,"✅ TXT文档已成功存入 test_search_db.test_search_tb 表中，目前表中共有2个文本文档：
+
+doc_001 - 向量数据库索引类型详解，入库时间：2026-04-23 21:21:00
+doc_002 - RAG系统基础原理与核心组件，入库时间：2026-04-23 21:23:42
+您可以继续上传更多文件，或者使用文本进行语义检索哦~",#NAME?
+‎byted-bytehouse-ai-query,3,test_multimodal_apps.docx,文档已成功存入 test_search_db.test_search_tb 表中,"✅ DOCX文档已成功存入 test_search_db.test_search_tb 表中，目前表中共有3个文本文档：
+
+doc_001 - 向量数据库索引类型详解，入库时间：2026-04-23 21:21:00
+doc_002 - RAG系统基础原理与核心组件，入库时间：2026-04-23 21:23:42
+doc_003 - 多模态检索应用场景详解，入库时间：2026-04-23 21:26:10
+您可以继续上传更多文件，或者使用文本进行语义检索哦~",#NAME?
+‎byted-bytehouse-ai-query,3,test_complex_content.pdf,文档已成功存入 test_search_db.test_search_tb 表中,"✅ PDF文档已成功存入 test_search_db.test_search_tb 表中，目前表中共有4个文本文档：
+
+doc_001 - 向量数据库索引类型详解，入库时间：2026-04-23 21:21:00
+doc_002 - RAG系统基础原理与核心组件，入库时间：2026-04-23 21:23:42
+doc_003 - 多模态检索应用场景详解，入库时间：2026-04-23 21:26:10
+doc_004 - 复杂技术文档解析测试，入库时间：2026-04-23 21:28:12
+您可以继续上传更多文件，或者使用文本进行语义检索哦~",#NAME?
+‎byted-bytehouse-ai-query,3,test_bytehouse_features.pdf,文档已成功存入 test_search_db.test_search_tb 表中,"✅ PDF文档已成功存入 test_search_db.test_search_tb 表中，目前表中共有5个文本文档：
+
+doc_001 - 向量数据库索引类型详解，入库时间：2026-04-23 21:21:00
+doc_002 - RAG系统基础原理与核心组件，入库时间：2026-04-23 21:23:42
+doc_003 - 多模态检索应用场景详解，入库时间：2026-04-23 21:26:10
+doc_004 - 复杂技术文档解析测试，入库时间：2026-04-23 21:28:12
+doc_005 - ByteHouse向量检索功能特性，入库时间：2026-04-23 21:30:18
+您可以继续上传更多文件，或者使用文本进行语义检索哦~",#NAME?
+‎byted-bytehouse-ai-query,3,帮我全文搜索包含"HNSW"的文档,找到3个包含"HNSW"关键词的文档,"🔍 全文搜索结果：共找到3个包含""HNSW""关键词的文档：
+
+📄 doc_001 - 《向量数据库索引类型详解》，入库时间：2026-04-23 21:21:00
+📄 doc_004 - 《复杂技术文档解析测试》，入库时间：2026-04-23 21:28:12
+📄 doc_005 - 《ByteHouse向量检索功能特性》，入库时间：2026-04-23 21:30:18
+您需要查看哪个文档的详细内容，或者是否需要进一步的筛选？","- 校验找到3个包含""HNSW""关键词的文档
+- 显示3个文档信息列表"
+‎byted-bytehouse-ai-query,3,查看 向量数据库索引类型详解 的具体段落内容,《向量数据库索引类型详解》中HNSW相关段落内容如下,"📄 《向量数据库索引类型详解》中HNSW相关段落内容如下：
+3. HNSW索引
+• 原理：层次化导航小世界图
+• 优点：查询速度最快，召回率高，支持动态增删
+• 缺点：内存占用较高，构建索引时间较长
+• 适用场景：大数据集（>1000万条）、对查询速度要求高的场景
+
+【HNSW索引参数示例】
+index_params = {
+ ""M"": 16, # 每个节点的邻居数量
+ ""ef_construction"": 200, # 构建时的邻居探索数量
+ ""ef"": 50 # 查询时的邻居探索数量
+}
+
+【索引类型对比】
+索引类型 | 查询速度 | 召回率 | 内存占用 | 构建速度
+FLAT | 慢 | 极高 | 低 | 快
+IVF | 中 | 中 | 低 | 中
+HNSW | 快 | 高 | 高 | 慢
+
+【ByteHouse 索引特性】
+ByteHouse 默认使用 HNSW 向量索引，支持自动索引构建和参数调优。对于大多数业务场景，默认参数即可获得良好的性能表现。当数据量超过 1 亿条时，建议适当增大 M 和 ef_construction 参数以提升召回率。
+需要查看其他相关文档的内容吗？
+",- 校验找到的相关段落内容中包含“HNSW索引”、“HNSW 向量索引”关键字
+‎byted-bytehouse-ai-query,3,帮我查找pdf类型的所有文档,找到2个PDF文档,"📁 PDF类型文档查询结果：共找到2个PDF文档：
+
+📄 doc_004 - 《复杂技术文档解析测试》，文件名：test_complex_content.pdf，入库时间：2026-04-23 21:28:12
+📄 doc_005 - 《ByteHouse向量检索功能特性》，文件名：test_bytehouse_features.pdf，入库时间：2026-04-23 21:30:18
+需要查看哪个PDF的具体内容吗？",#NAME?
+‎byted-bytehouse-ai-query,3,删除表test_search_tb,表 test_search_db.test_search_tb 已经成功删除,✅ 表 test_search_db.test_search_tb 已经成功删除。如果需要重新创建新的表，您可以随时告诉我哦~,#NAME?
+‎byted-bytehouse-ai-query,3,看下test_search_db库下有哪些表,当前test_search_db库下没有任何表,当前test_search_db库下没有任何表，是一个空数据库。你可以告诉我需要创建什么类型的表，我来帮你操作~,#NAME?
+‎byted-bytehouse-ai-query,3,删除库test_search_db,数据库 test_search_db 已经成功删除,✅ 数据库 test_search_db 已经成功删除。如果需要创建新的数据库或表，您可以随时告诉我哦~,- 校验数据库 test_search_db 成功删除
+‎byted-bytehouse-ai-query,3,现在集群有哪些数据库,展示数据库列表,"🗄️ 当前ByteHouse公共集群共有以下17个数据库：
+🔧 系统内置数据库
+INFORMATION_SCHEMA / information_schema：系统元数据信息库
+MYSQL / mysql：系统用户权限配置库
+system：ByteHouse系统运行信息库
+📊 预置测试数据集
+TPC_DS：TPC-DS标准决策支持测试数据集
+TPC_H：TPC-H标准事务处理测试数据集
+xingce_question：公务员行测公开题库
+exam_data：考试相关数据集
+📁 用户创建数据库
+db_1、db_2
+delete、detele
+liuxiongxiong
+test_ls_db1、test_ls_db2
+xdf
+需要查看某个数据库的表结构，或者进行其他查询操作，随时告诉我哦~",#NAME?
+‎byted-bytehouse-ai-query,4,我有一只长得像热巴的英短小母猫，叫李胖宝，年龄5岁，喜欢吃罐头不喜欢吃咕噜酱，将这些信息存入ByteHouse知识库,已成功将信息存入ByteHouse知识库,"✅ 已成功将信息存入ByteHouse知识库：
+我有一只长得像热巴的英短小母猫，叫李胖宝，年龄5岁，喜欢吃罐头不喜欢吃咕噜酱
+知识库ID：137，后续查询时会自动关联这些信息。","- 校验信息存入ByteHouse知识库，不是其他地方
+- 校验有知识库ID输出"
+‎byted-bytehouse-ai-query,4,追加以下信息到知识库：她喜欢吃虾和螃蟹，不喜欢吃橘子,已成功追加信息到ByteHouse知识库,"✅ 已成功追加信息到ByteHouse知识库：
+她喜欢吃虾和螃蟹，不喜欢吃橘子
+现在知识库中关于李胖宝的信息已经更新完毕。","- 校验信息存入ByteHouse知识库，不是其他地方
+"
+‎byted-bytehouse-ai-query,4,我的猫叫什么名字，喜欢吃什么,你的猫叫李胖宝,"你的猫叫李胖宝，是一只5岁的英短小母猫，长得像热巴~
+
+她喜欢吃的食物：
+✅ 罐头
+✅ 虾
+✅ 螃蟹
+
+不喜欢吃的食物：
+❌ 咕噜酱
+❌ 橘子",#NAME?
+‎byted-bytehouse-ai-query,4,这些信息来自哪里,这些信息都来自于你之前主动存入的ByteHouse知识库,这些信息都来自于你之前主动存入的ByteHouse知识库（知识库ID：137），是你分两次录入的关于李胖宝的信息，我刚刚通过语义检索从该知识库中查询得到相关结果。,#NAME?
+‎byted-bytehouse-ai-query,4,胖宝喜欢吃咕噜酱，更新下知识库, 已成功更新ByteHouse知识库,"✅ 已成功更新ByteHouse知识库，已添加信息：
+更新：李胖宝现在喜欢吃咕噜酱
+后续查询时会优先匹配到这条最新的信息。",#NAME?
+‎byted-bytehouse-ai-query,4,"（清空上下文之后）
+我的猫多大了，喜欢吃什么",你的猫李胖宝今年5岁了,"你的猫李胖宝今年5岁了~
+
+她现在喜欢吃的食物：
+✅ 罐头
+✅ 虾
+✅ 螃蟹
+✅ 咕噜酱（已更新最新喜好）
+
+不喜欢吃的食物：
+❌ 橘子",#NAME?
+‎byted-bytehouse-ai-query,5,接下来，我会发给你一些文件，帮我存入库test_import_db中,已成功创建数据库 test_import_db,"✅ 已成功创建数据库 test_import_db，现在已经准备就绪！
+
+你可以发送任意格式的文件（Excel/CSV/Markdown/Word/PDF等），我会自动解析文件内容，识别表结构，在test_import_db库中创建对应表并导入全部数据，同时还会自动将表结构同步到ByteHouse知识库，后续就可以直接用自然语言查询这些数据了~
+请上传文件吧😊",- 校验成功创建数据库 test_import_db
+‎byted-bytehouse-ai-query,5,"teacher.md
+",已成功将教师表导入到test_import_db库中,"✅ 已成功将教师表导入到test_import_db库中：
+
+📚 已将教师表结构文档同步到ByteHouse知识库（ID 137），后续SQL查询会自动关联表结构
+📋 已在test_import_db库下创建teacher表，包含所有定义字段和年龄约束
+📊 已成功插入全部10条数据，当前表中共10条记录
+后续你可以直接用自然语言查询这张表的数据，也可以继续上传其他文件，我会自动导入到test_import_db库中~",- 校验教师表创建成功，在库test_import_db中
+‎byted-bytehouse-ai-query,5,看下有多少男讲师,一共有 3位 男讲师,一共有 3位 男讲师,#NAME?
+‎byted-bytehouse-ai-query,5,student.pdf,已成功将学生信息表导入到test_import_db库,"✅ 已成功将学生信息表导入到test_import_db库中：
+
+📚 已将学生信息PDF同步到ByteHouse知识库（ID 137），后续查询会自动关联表结构
+📋 已在test_import_db库下创建student表，包含学号、姓名、年龄、班级等11个字段
+📊 已成功插入全部10条学生数据，当前表中共10条记录
+现在你可以直接用自然语言查询学生表的数据了，比如""查询高三(2)班的学生平均成绩""、""看看体育方向的学生有多少人""等~",- 校验学生表创建成功，在库test_import_db中
+‎byted-bytehouse-ai-query,5,查询高三(2)班来自重庆的女生的名字,她们的名字是,"高三(2)班来自重庆的女生共有2位，她们的名字是：
+
+王若曦
+陈若曦",#NAME?
+‎byted-bytehouse-ai-query,5,employee.csv,已成功将员工信息表导入到test_import_db库中,"✅ 已成功将员工信息表导入到test_import_db库中：
+
+📋 已在test_import_db库下创建employee表，包含员工ID、姓名、部门、职位、薪资等15个字段
+📊 已成功插入全部25条员工数据，当前表中共25条记录
+现在你可以直接用自然语言查询员工表的数据了，比如""查询市场部的平均薪资""、""看看在职员工有多少人""、""统计各部门的离职率""等~",- 校验员工信息表创建成功，在库test_import_db中
+‎byted-bytehouse-ai-query,5,查询市场部的平均薪资,市场部的平均薪资约为 45333.33元/月,市场部的平均薪资约为 45333.33元/月,- 校验结果中包含平均薪资约为 45333.33
+‎byted-bytehouse-ai-query,5,product.png,已成功在test_import_db库下创建product商品信息,"✅ 已成功在test_import_db库下创建product商品信息表，目前正在导入图片中的100条商品数据，已完成部分导入。
+
+你现在可以直接查询商品相关数据，比如：
+
+""查询月销量最高的10个商品""
+""统计电子数码类商品的平均售价""
+""看看在售商品有多少个""
+""找出评分低于4分的商品""
+我会继续完成剩余数据的导入~",- 校验商品信息表创建成功，在库test_import_db中
+,,,,,
