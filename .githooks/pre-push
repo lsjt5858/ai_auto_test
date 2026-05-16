@@ -1,0 +1,26 @@
+#!/bin/sh
+set -eu
+
+repo_root="$(git rev-parse --show-toplevel)"
+cd "$repo_root"
+
+zero_sha="0000000000000000000000000000000000000000"
+empty_tree_sha="4b825dc642cb6eb9a060e54bf8d69288fbee4904"
+default_remote_ref="$(git symbolic-ref refs/remotes/origin/HEAD 2>/dev/null || true)"
+
+while read -r local_ref local_sha remote_ref remote_sha; do
+  [ -z "${local_ref:-}" ] && continue
+  [ "$local_sha" = "$zero_sha" ] && continue
+
+  if [ "$remote_sha" = "$zero_sha" ]; then
+    if [ -n "$default_remote_ref" ]; then
+      base_sha="$(git merge-base "$local_sha" "$default_remote_ref")"
+    else
+      base_sha="$empty_tree_sha"
+    fi
+  else
+    base_sha="$remote_sha"
+  fi
+
+  python3 tools/check_protected_paths.py --mode range --base "$base_sha" --head "$local_sha"
+done
