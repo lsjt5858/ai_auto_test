@@ -1,0 +1,247 @@
+skill,对话轮次,input,预期的返回（部分关键信息）,真实返回举例（ArkClaw）,rule
+byted-bytehouse-data-asset-analyzer,1,帮我查看当前集群的配置信息,用户不需要手动配置且能链接到集群,ByteHouse集群配置状态检查结果-当前未配置有效连接-所需环境变量配置项-配置方式-配置完成后可提供的集群信息,"- 如果有HOST信息输出，不允许出现链接包含 tenant-xxx-字样
+- 如果有密码信息输出，不允许显示明文密码，掩码、部分脱敏、不显示、礼貌拒绝均符合预期
+- 如果提示连接成功，且展示当前集群的已有的数据库列表符合预期
+- 如果出现预置的一些数据集或者数据也是符合预期"
+byted-bytehouse-data-asset-analyzer,1,获取数据库列表,返回当前环境下所有数据库列表。,"- 成功返回ByteHouse完整数据库列表信息
+
+- 返回内容主要包含三个结构：
+
+- 一是“ByteHouse数据库列表”表格，提示共25个数据库，展示了序号、数据库名和表数量字段，具体列出了system（58张）、INFORMATION_SCHEMA（30张）等数据库名称及表规模
+
+- 二是“推荐分析的数据库”表格，包含推荐星级、数据库和说明字段，展示了TPC_DS、db_1、db_2、liuxiongxiong四个推荐库，并给出了如标准测试数据集、业务数据库等对应的适用场景说明
+
+- 最后提供了生成完整数据Schema、数据资产目录和血缘分析报告保存在默认目录下","- 需成功返回数据库列表而非报错
+- 返回内容中需明确存在数据库名称集合（数组、表格或逐行枚举均可）
+- 至少能识别出 1 个数据库名
+- 不得要求用户补充连接配置
+- 若产出结构化结果，数据库列表字段应为非空数组"
+byted-bytehouse-data-asset-analyzer,1,获取 liuxiongxiong 数据库详情,正确输出数据库资产总览、库下表详情、核心字段血缘，并在指定目录生成内容正确的合法 JSON 文件。,"- 成功获取并分析 liuxiongxiong 数据库详情，资产总览包含总表数 6 张、总列数 61 列、引擎 CnchMergeTree、共享列 10 组及表关系 0 组
+
+- 报告详细列出了 test_add、demo_scalar_search 等 6 张表的列数及说明信息，分析了跨表共享的 title、content、create_time 等核心字段血缘，以及 merge-tree、cnch、test-table 等标签的统计数据
+
+- 最终结果成功生成并保存至 
+/root/.openclaw/workspace/.agents/skills/bytehouse-data-asset-analyzer/scripts/output/ 目录下，包含 
+schema_liuxiongxiong_*.json (表结构)、
+catalog_liuxiongxiong_*.json (资产目录) 
+lineage_liuxiongxiong_*.json (血缘报告) 三个结果文件","- 需成功识别目标数据库为 liuxiongxiong
+- 文本结果需包含数据库级总览信息（如表数量、资产概况、核心对象）
+- 需包含至少一个库下表的详情或清单
+- 需包含核心字段血缘/关系分析描述
+- 输出目录中需存在 schema/catalog/lineage 三类 JSON 文件，文件名带数据库名与时间戳
+- 3 个文件均需可被标准 JSON 解析器成功解析
+- 不得把失败信息伪装成空报告"
+byted-bytehouse-data-asset-analyzer,1,获取 kong 数据库详情,针对 0 张表的空库生成 schema、catalog、lineage 三份合法 JSON，内容结构正确且能体现空库状态。,"- 成功返回 kong 数据库分析结果，提示该数据库为空，资产总览显示总表数 0 张、总列数 0 列、无引擎分布及表关系数据
+- 系统同步推荐了含业务数据的备选数据库，包括 TPC_DS（24 张）、db_1（25 张）等，引导用户选择含数据的库进行分析
+- 最终结构化结果已生成并保存至 /root/.openclaw/workspace/.agents/skills/bytehouse-data-asset-analyzer/scripts/output/ 目录下，包含 schema_kong_20260510_160807.json（tables 为空数组）、catalog_kong_20260510_160807.json（total_tables=0、total_columns=0）以及 lineage_kong_20260510_160807.json（table_relationships 为空数组、total_relationships=0）三个结果文件","- 需成功识别目标数据库 kong
+- 需明确说明该库为 0 张表或无表
+- 仍需生成 schema/catalog/lineage 三个 JSON 文件
+- 文件内容结构需合法，空集合场景应使用空数组/空对象等合理表示，而不是缺字段或非法 JSON
+- 不应因空库直接报错退出"
+byted-bytehouse-data-asset-analyzer,1,获取  hahahaha  数据库详情,当数据库不存在时，清晰返回失败原因，不生成误导性的空报告。,"- 返回的是明确的“数据库不存在”错误：系统提示 hahahaha 数据库不存在，因此无法继续分析或获取表详情
+
+- 同时列出了当前可用数据库及表数量（如 system、TPC_DS、db_1、liuxiongxiong 等），并提示用户改用正确库名重新发起分析
+
+- 整个过程未生成任何结果文件",执行结果需为明确失败态-错误信息中需清楚表达数据库不存在/无权限/名称错误中的至少一种原因-不得输出看似成功的数据库详情、表清单或资产报告-不得生成误导性的空 schema/catalog/lineage 报告作为成功结果
+byted-bytehouse-data-asset-analyzer,1,获取liuxiongxiong 库下所有表！,正确返回数据库总览信息，以及库下所有表及其总数。,"- 成功返回 liuxiongxiong 库下全部 6 张表的结构化概览：数据库总览给出总表数 6、总列数 61、引擎均为 CnchMergeTree
+
+- 逐表列出了 demo_fulltext_search、demo_hybrid_search、demo_multimodal_search、demo_scalar_search、demo_vector_search、test_add 的字段清单与类型
+
+- 同时总结了跨表高频字段（如 title、content、create_time、doc_id、embedding）并给出这是一个多模态搜索演示库的业务洞察","- 需识别目标库 liuxiongxiong
+- 结果中需明确给出该库表总数
+- 需返回表名列表，数量与总数一致
+- 至少为每张表返回基础属性中的一种（如列数、引擎、简介等）
+- 不得遗漏明显存在的表或混入其他库表名"
+byted-bytehouse-data-asset-analyzer,1,获取 liuxiongxiong 库下 demo_fulltext_search 详情,返回单表基本信息、表结构、重要特性、样例数据、字段分布和业务价值。,"- 成功获取 `liuxiongxiong.demo_fulltext_search` 表的完整详情，详细信息已保存至 `liuxiongxiong_demo_fulltext_search_details.json` 文件
+
+- 详情结构包括：基本概览显示表引擎为 `CnchMergeTree`，包含 10 行数据、9 列字段，主键与排序键为 `article_id`，分区键为 `toDate(publish_date)`
+
+- 表结构定义列出了 `article_id`、`title`、`content` 等 9 个字段的类型和说明
+
+- 索引特性重点说明了 `title` 和 `content` 字段建有 `idx_title` 和 `idx_content` 倒排索引
+
+- 此外，还提供了完整的建表语句(DDL)、前 5 行样例数据、作者与分类的字段值分布，以及相关的业务典型查询场景","- 需识别目标表为 liuxiongxiong.demo_fulltext_search
+- 需返回表基本信息（至少表名、库名，最好含引擎/行列规模）
+- 需返回字段结构定义，字段名和类型可解析
+- 需包含重要特性说明，尤其与全文搜索相关
+- 需包含样例数据或样例记录描述
+- 需包含字段分布或字段统计信息
+- 需包含业务价值/典型使用场景说明
+- 允许示例 SQL 不可执行，但不能缺失核心表信息"
+byted-bytehouse-data-asset-analyzer,1,分析 liuxiongxiong库下 demo_fulltext_search 表的字段,返回表基本信息统计、字段类型分布、字段详细分析、索引信息和字段质量评估。,"- 成功返回 demo_fulltext_search 表字段深度分析报告
+
+- 基本信息显示完整表名为 liuxiongxiong.demo_fulltext_search，引擎为 CnchMergeTree，数据共10行，包含9个字段
+
+- 字段类型包含 String(3个)、LowCardinality(2个)、UInt32(1个)、Date(1个)、Array(1个)、DateTime(1个)
+
+- 详细分析列出了 article_id、title、content、author、category、publish_date、tags、create_time 和 doc_id 9个字段的指标与分布，其中 title 和 content 建有 inverted 倒排索引
+
+- doc_id 全部为空字符串，被标记为冗余字段建议清理
+
+- create_time 所有数据相同
+
+- 质量评估指出 9/9 字段非空等优点，并给出删除 doc_id、优化 create_time 及补充字段注释的建议","- 需识别目标表为 liuxiongxiong.demo_fulltext_search
+- 需给出字段层面的总体统计（如字段总数、主键/索引概况）
+- 需给出字段类型分布统计
+- 至少逐项分析多个字段，包含字段名、类型、用途或质量判断
+- 需包含索引信息
+- 需包含字段质量评估或改进建议
+- 结果不能仅停留在原始 DESCRIBE 输出，需有分析性总结"
+byted-bytehouse-data-asset-analyzer,1,分析 liuxiongxiong库下 test_add 表的字段,返回表基本信息统计、字段类型分布、字段详情、关键字段分析、样例数据、表配置、字段质量评估与业务洞察。,"- 成功返回liuxiongxiong.test_add表的字段分析报告，包含：
+
+- 1）基本信息（1000行，16个字段，CnchMergeTree引擎）
+
+- 2）字段类型分布（String占50%等）
+
+- 3）字段详情清单（含kong、receiv_time_house等类型与非空率）
+
+- 4）关键字段深度分析（含复杂类型，并指出doc_id、title、content全为空可删除）
+
+- 5）第1行样例数据解析
+
+- 6）表配置信息（分区键、排序键、TTL等）
+
+- 7）字段质量评估与优化建议（建议修正命名拼写、补全注释及修改低基数类型）
+
+- 8）将其识别为客户/用户测试表的业务洞察","- 需识别目标表为 liuxiongxiong.test_add
+- 需返回字段总体统计与类型分布
+- 需返回完整或近完整字段详情清单
+- 至少识别并分析若干关键字段
+- 需包含样例数据预览
+- 需包含表配置信息（如引擎、主键、排序键、分区键中的至少一类）
+- 需包含字段质量评估与优化建议
+- 需包含业务洞察，不得只输出原始元数据"
+byted-bytehouse-data-asset-analyzer,1,提取demo_fulltext_search 表 引擎注释等！,返回核心元数据、字段详细信息（含注释）、索引信息、完整建表语句、引擎特性解读和全文搜索说明。,"- 返回了 demo_fulltext_search 表的引擎与元数据完整报告，包含六大核心模块：
+
+- 一、核心元数据提取了数据库 liuxiongxiong、引擎 CnchMergeTree、主排序键 article_id、分区键 toDate(publish_date) 及总行数10行等信息
+
+- 二、字段详细信息呈现了 article_id 等9个字段的类型、主键(PK)及分区键(PART)标识
+
+- 三、索引信息指明了 idx_title 和 idx_content 两个 inverted 倒排索引
+
+- 四、提供了完整的 CREATE TABLE DDL 语句，涵盖中文字段注释、PARTITION BY、ORDER BY 规则及 SETTINGS 等配置
+
+- 五、解读了 CnchMergeTree 存算分离架构等引擎核心特性和 index_granularity=8192 等表配置项
+
+- 六、通过3条基于 MATCH 语法的 SQL 示例展示了倒排索引的全文搜索功能","- 需识别目标表 demo_fulltext_search
+- 需返回核心元数据，至少包括引擎和表名
+- 字段明细中需包含字段名、类型，若有注释则应展示或说明无注释
+- 需包含索引信息，尤其是全文/倒排索引
+- 需返回完整或基本完整的 CREATE TABLE 语句
+- 需包含引擎特性解读
+- 需包含全文搜索功能说明"
+byted-bytehouse-data-asset-analyzer,1,liuxiongxiong数据库的行数统计,返回数据库级总行数、引擎信息、各表详细行数、数据分布分析及各表主键/排序键。,"- 成功返回了liuxiongxiong数据库的行数统计汇总
+
+- 总体统计指标包含表数量（6张）、总数据行数（1050行）和引擎（全部CnchMergeTree）
+
+- 各表详细行数展示了6张表的COUNT(*)行数与占比，其中test_add表1000行（95.2%），其余5张demo相关表（demo_fulltext_search、demo_hybrid_search、demo_multimodal_search、demo_scalar_search、demo_vector_search）各10行（各占0.9%）
+
+- 此外提供了数据分布可视化、业务洞察（包含5张搜索功能演示表共50行，1张功能测试表共1000行），并列出了各表主键/排序键（如test_add为id，demo_scalar_search为category, brand, product_id等）","- 需识别目标库 liuxiongxiong
+- 需给出数据库级总行数或总量汇总
+- 需给出各表行数明细，至少覆盖多个表
+- 需包含数据分布分析或排名/占比
+- 需尽可能包含各表主键或排序键信息
+- 若个别表缺统计，应明确说明原因，不能整体缺失行数信息"
+byted-bytehouse-data-asset-analyzer,1,liuxiongxiong.demo_hybrid_search  表的行列总数统计,返回单表总行数、总列数、总数据点、字段详细列表、索引信息和基本配置。,"- 返回了 demo_hybrid_search 表的行列总数统计汇总，核心统计包含总行数10行、总列数9列、总计数据点90个
+
+- 提供了 doc_id、title、content、embedding 等9个字段的详细列表及类型
+
+- 列出了 vec_idx(hnsw)、title_idx(inverted)、content_idx(inverted) 索引信息
+
+- 展示了以 CnchMergeTree 为引擎的基本配置
+
+- 并解读了该表作为 ByteHouse 混合搜索核心演示表所具备的全文搜索加向量搜索一体化能力的业务价值","- 需识别目标表为 liuxiongxiong.demo_hybrid_search
+- 需返回总行数和总列数两个核心指标
+- 需返回总数据点，且可由行数×列数推导或直接给出
+- 需返回字段详细列表
+- 需包含索引信息，尤其体现混合搜索相关特性
+- 需包含基本配置（如引擎、排序键、分区键、主键中的至少一项）"
+byted-bytehouse-data-asset-analyzer,1,分析liuxiongxiong库demo_multimodal_search表的数据资产,返回表资产对象及表概览、字段结构、索引特性、建表语句、业务价值，并输出合法 JSON。,"- 返回了liuxiongxiong库demo_multimodal_search表的数据资产分析报告，未见数据血缘相关内容
+
+- 报告主要结构包含：表基本概览（引擎CnchMergeTree，共10行8列，排序列id）、8个字段详细结构（涵盖id、content_type、content、title、embedding、metadata、create_time、doc_id及对应类型）、索引特性（HNSW向量索引vec_idx，倒排全文索引title_idx、content_idx/text_idx）、多模态类型分布统计（文本5条占50%、图像3条占30%、视频2条占20%），并提供了建表语句核心代码、综合评分9.75/10.00的价值评估及业务应用场景，最后提示详细JSON报告已保存为liuxiongxiong_demo_multimodal_search_asset.json文件","- 需识别目标表为 liuxiongxiong.demo_multimodal_search
+- 表资产对象中至少需包含表名、引擎、行数、列数、主键、排序键、分区键、标签这些字段中的大部分，缺失项需显式标空而非省略
+- 需包含表概览信息
+- 需包含字段结构
+- 需包含索引特性
+- 需包含建表语句
+- 需包含业务价值分析
+- 若有文件输出，必须为合法 JSON"
+byted-bytehouse-data-asset-analyzer,1,分析liuxiongxiong库test_add表的数据资产,返回表概览、核心表属性、字段结构、业务价值，并输出合法 JSON。,"- 成功分析liuxiongxiong库test_add表的数据资产，返回包含表概览、字段结构、核心发现、数据特征分布、优化建议及综合评分等主要结构的报告
+
+- 表概览显示引擎为CnchMergeTree，数据量1000行，共16列，主键/排序键为id，分区键为toDate(receiv_time_house)，包含TTL策略
+
+- 字段分析涵盖了数值、字符串、日期及Map、Array等复杂类型，指出了kong、brith、biangeng等拼音命名问题，以及doc_id、title、content全为空字符串的冗余字段
+
+- 报告还总结了部门、年龄、金额的数据分布及测试业务场景，提供了字段命名、冗余清理、索引优化等建议，最终综合评分为7.5/10.00，详细JSON报告已保存为liuxiongxiong_test_add_asset.json","- 需识别目标表为 liuxiongxiong.test_add
+- 表概览至少需包含表名、引擎、行数、列数
+- 需尽可能返回主键、排序键、分区键、标签等属性，缺失时应有明确说明
+- 需包含字段结构信息
+- 需包含业务价值分析
+- 若有导出文件，必须为合法 JSON
+- 不得误输出血缘关系作为必需结果"
+byted-bytehouse-data-asset-analyzer,1,分析liuxiongxiong 库，列相似性,返回核心发现、跨表共享列排行、类型冲突检测、共享字段矩阵、基于共享字段的表关联及数据建模洞察。,"- 返回了 liuxiongxiong 库的跨表列相似性分析报告：共分析 6 张表、61 个字段，识别出 10 组共享字段和 2 组类型冲突
+
+- 共享列排行中 content、title 覆盖 6 张表，create_time 覆盖 5 张表，doc_id 与 embedding 也高频出现
+
+- 报告进一步给出共享字段分布矩阵和表关联关系（如 demo_fulltext_search 与 demo_hybrid_search 共享 7 个字段），并指出 doc_id 类型不统一、id/doc_id 命名混用、test_add 存在冗余空字段，建议统一核心字段类型与命名规范","- 需识别分析范围为整个 liuxiongxiong 库
+- 需输出共享列/相似列的汇总结果
+- 需包含跨表共享列排行榜或等价排名信息
+- 需包含同名字段类型冲突检测
+- 需包含共享字段分布矩阵、映射表或等价结构
+- 需基于共享字段给出表关联分析
+- 需输出建模洞察或优化建议
+- 不能把所有同名列直接视为同义关系而不做类型校验"
+byted-bytehouse-data-asset-analyzer,1,分析liuxiongxiong 库 ，demo_fulltext_search和demo_hybrid_search列相似性,返回两表基本统计对比、共享字段、独有字段、索引配置对比、相似性评分、业务洞察和优化建议，并正确区分同名不同类型字段。,"- 返回了针对liuxiongxiong库中demo_fulltext_search与demo_hybrid_search两张表的列相似性深度分析结果，主要结构包含基本统计对比、共享字段明细、独有字段对比、相似性评分及优化建议等
+
+- 核心指标显示两表各有9个字段，其中共享字段8个，有7个类型完全一致，doc_id字段类型存在差异（分别对应String和UInt64）
+
+- 两表各含1个独有字段，分别为demo_fulltext_search的article_id（UInt32类型）与demo_hybrid_search的embedding（Array(Float32)类型），整体字段重合度达88.9%，并给出了统一doc_id类型的优化建议","- 需识别对比对象为 demo_fulltext_search 与 demo_hybrid_search
+- 需输出两表基础统计对比
+- 需输出共享字段明细
+- 需输出各自独有字段
+- 需输出索引配置对比
+- 需给出相似性评分或等级
+- 需包含业务洞察与优化建议
+- 同名同类型字段出现在至少 2 张表时应被识别为共享字段
+- 同名不同类型字段不得合并，必须按 name:type 区分"
+byted-bytehouse-data-asset-analyzer,2,分析结果的本地下载,分析结果可在本地下载，至少能看到 schema、catalog、lineage 三类输出文件。,"- 成功下载了三个JSON格式的分析结果文件，分析目标均为数据库 liuxiongxiong
+
+- catalog 文件记录了概要与表结构，其中 summary 统计总表数为 6、总列数为 53、引擎 CnchMergeTree 数量为 6，并列出了 tables 数组下的列信息
+
+- lineage 文件记录了数据血缘与相似度，包含 table_relationships 和 column_similarities 字段，展示了各字段在不同表中的分布情况
+
+- schema 文件提供了详细的建表属性，包含 tables 数组下各列的 type、default_type、default_expression、codec_expression 和 ttl_expression 等字段的详细配置",分析完成后本地需可见导出文件-至少需包含 schema、catalog、lineage 三类结果文件-文件名需可区分不同导出类型-用户无需额外手工拼接结果才能获取文件
+byted-bytehouse-data-asset-analyzer,2,三份 JSON 文件均生成且命名符合约定,输出目录下生成 schema/catalog/lineage 三个文件，且文件名包含数据库名和时间戳。,"- 在 ~/.openclaw/workspace/.agents/skills/bytehouse-data-asset-analyzer/scripts/output 目录下执行 ll 命令，返回列表中包含多组 JSON 文件
+
+- 针对每个任务实例（如 bytehouse_demo、kong、liuxiongxiong），均对应生成了三份文件，分别以 catalog_、lineage_、schema_ 为前缀，结合任务名与时间戳进行命名（如 catalog_kong_20260510_160807.json、lineage_kong_20260510_160807.json、schema_kong_20260510_160807.json），真实返回证明三份 JSON 文件均已生成且命名格式完全符合约定","- 单次运行需生成恰好或至少 3 个核心 JSON 文件：schema、catalog、lineage
+- 三者文件名均需包含数据库名
+- 三者文件名均需包含时间戳，格式至少精确到秒级或等价唯一标识
+- 文件扩展名需为 .json"
+byted-bytehouse-data-asset-analyzer,2,JSON 可被标准解析器解析（合法 JSON）,3 个输出文件均为合法 JSON，且中文内容正常展示。,"- 在 /root/.openclaw/workspace/.agents/skills/bytehouse-data-asset-analyzer/scripts/output 路径下成功生成了 12 个 .json 格式的结果文件
+
+- 这些文件分为 catalog、lineage 和 schema 三类，分别对应 bytehouse_demo、kong 和 liuxiongxiong 等目标，文件大小从 87 字节到 17656 字节不等","schema/catalog/lineage 三个文件均需可被标准 JSON 解析器成功解析-文件顶层结构需为对象或数组,括号/逗号/引号合法-中文内容需显示正常,不应出现乱码-允许包含 UNICODE 转义,但解析后中文语义必须正常可读"
+byted-bytehouse-data-asset-analyzer,2,重复运行不会覆盖历史文件（时间戳策略）,重复执行两次后，两轮各生成 3 个文件，文件名不同，历史文件不会被覆盖。,"- scripts/output 目录下返回了 12 个 JSON 结果文件，涵盖 catalog、lineage 和 schema 三类数据
+
+- 对于同一目标数据源 bytehouse_demo，每类数据均存在两个带有不同时间戳后缀（20260510_154148 和 20260510_154326）的独立文件（如 catalog_bytehouse_demo_20260510_154148.json 和 catalog_bytehouse_demo_20260510_154326.json），
+历史文件均完整保留未被覆盖","- 连续两次运行后，每次都需生成 schema/catalog/lineage 三类文件
+- 第二次运行生成的 3 个文件名需与第一次对应文件名不同
+- 第一次文件仍然存在，未被覆盖或删除
+- 差异需由时间戳或其他唯一后缀体现"
+,,,,,
+,,,,,
+,,"
+",,,
+,,"
+",,,
+,,"
+",,,
+,,"
+",,,
+,,"
+",,,
+,,"
+",,,
+,,"
+",,,
+,,"
+",,,
